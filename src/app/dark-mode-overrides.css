@@ -1,0 +1,44 @@
+/* Dark Mode Specific Overrides for Page Elements */
+
+/* Hero badge */
+[data-theme="dark"] .hero-badge {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--color-text-secondary) !important;
+}
+
+/* Hero heading override */
+[data-theme="dark"] .hero-heading {
+    color: var(--color-text-primary) !important;
+}
+
+/* Service cards in dark mode */
+[data-theme="dark"] .service-card {
+    background: var(--color-surface) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Footer in dark mode */
+[data-theme="dark"] .footer {
+    background-color: var(--color-surface);
+    border-top-color: var(--color-border);
+}
+
+[data-theme="dark"] .footer-heading {
+    color: var(--color-text-primary);
+}
+
+/* Hero image wrapper dark mode */
+[data-theme="dark"] .hero-image-wrapper {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Trust indicators section */
+[data-theme="dark"] .trust-text {
+    color: var(--color-text-secondary) !important;
+}
+
+/* CTA section - ensure text is visible on dark background image */
+[data-theme="dark"] .cta-overlay {
+    background: rgba(0, 0, 0, 0.75) !important;
+}

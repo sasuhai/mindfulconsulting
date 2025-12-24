@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Connection Test</title>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc } from 'https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-acF_FlO89lrI4-ec_PZErHe2iRo_4Mw",
+            authDomain: "mindfulconsulting-538b9.firebaseapp.com",
+            projectId: "mindfulconsulting-538b9",
+            storageBucket: "mindfulconsulting-538b9.appspot.com",
+            messagingSenderId: "481238244562",
+            appId: "1:481238244562:web:f5e85465912451bb17a10b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app, "mindfulconsulting");
+
+        document.getElementById('testRead').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Testing read...';
+            try {
+                const querySnapshot = await getDocs(collection(db, 'trainings'));
+                output.innerHTML = `✅ Read successful! Found ${querySnapshot.size} documents.`;
+                querySnapshot.forEach((doc) => {
+                    output.innerHTML += `<br>- ${doc.id}: ${JSON.stringify(doc.data())}`;
+                });
+            } catch (error) {
+                output.innerHTML = `❌ Read failed: ${error.message}`;
+                console.error(error);
+            }
+        });
+
+        document.getElementById('testWrite').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Testing write...';
+            try {
+                const docRef = await addDoc(collection(db, 'trainings'), {
+                    trainingId: 'TEST-001',
+                    title: 'Test Training',
+                    shortDescription: 'Test',
+                    summary: 'Test Summary',
+                    detailedDescription: 'Test Details',
+                    duration: '1 day',
+                    targetAudience: 'Test Audience',
+                    createdAt: new Date().toISOString()
+                });
+                output.innerHTML = `✅ Write successful! Document ID: ${docRef.id}`;
+            } catch (error) {
+                output.innerHTML = `❌ Write failed: ${error.message}`;
+                console.error(error);
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <p>Click the buttons below to test your Firebase connection:</p>
+    
+    <button id="testRead">Test Read (getDocs)</button>
+    <button id="testWrite">Test Write (addDoc)</button>
+    
+    <div id="output">Click a button to test...</div>
+
+    <h2>Expected Results:</h2>
+    <ul>
+        <li><strong>If both work:</strong> Your Firebase is configured correctly!</li>
+        <li><strong>If both fail with "Missing or insufficient permissions":</strong> Your Firestore rules are too restrictive.</li>
+        <li><strong>If you get other errors:</strong> Check your Firebase credentials in .env.local</li>
+    </ul>
+
+    <h2>Fix Permissions:</h2>
+    <p>Go to: <a href="https://console.firebase.google.com/project/mindfulconsulting-538b9/firestore/rules" target="_blank">Firestore Rules</a></p>
+    <p>Make sure your rules look like this:</p>
+    <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2025, 2, 1);
+    }
+  }
+}</pre>
+</body>
+</html>

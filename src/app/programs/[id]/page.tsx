@@ -1,93 +1,349 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
-export default async function ProgramDetail({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+interface Training {
+    id?: string;
+    trainingId: string;
+    title: string;
+    shortDescription: string;
+    summary: string;
+    detailedDescription: string;
+    duration: string;
+    targetAudience: string;
+    catalogUrl?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
-    // Mock Data
-    const programs: Record<string, any> = {
-        'leadership-mastery': {
-            title: 'Strategic Leadership Mastery',
-            desc: 'Refining strategic thinking for the C-suite.',
-            audience: 'Senior Executives, Directors, VPs',
-            modules: ['Strategic Visioning', 'Executive Presence', 'Decision Making under Pressure']
-        },
-        'mindful-manager': {
-            title: 'The Mindful Manager',
-            desc: 'Emotional intelligence for modern management.',
-            audience: 'New Managers, Team Leads',
-            modules: ['Self-Awareness', 'Empathy in Action', 'Conflict Resolution']
-        },
-        'team-synergy': {
-            title: 'High-Performance Team Synergy',
-            desc: 'Building trust and psychological safety.',
-            audience: 'Intact Teams, Project Squads',
-            modules: ['Psychological Safety', 'Values Alignment', 'Collaborative Problem Solving']
+export default function ProgramDetailPage() {
+    const params = useParams();
+    const router = useRouter();
+    const [training, setTraining] = useState<Training | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchTraining();
+    }, [params.id]);
+
+    const fetchTraining = async () => {
+        try {
+            const docRef = doc(db, 'trainings', params.id as string);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                setTraining({ id: docSnap.id, ...docSnap.data() } as Training);
+            } else {
+                console.error('Training not found');
+            }
+        } catch (error) {
+            console.error('Error fetching training:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const program = programs[id];
-
-    if (!program) {
-        // In a real app we might return notFound() or show a generic fallback
-        // using notFound() here:
-        // notFound();
-        // But for this demo let's just show a generic placeholder if ID not found
+    if (loading) {
         return (
-            <div className="main-wrapper">
-                <section className="section text-center">
-                    <div className="container">
-                        <h1 className="heading-1">Program Not Found</h1>
-                        <Link href="/programs" className="btn btn-secondary mt-4">Back to Programs</Link>
-                    </div>
-                </section>
+            <div className="main-wrapper" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+                <div className="container" style={{ maxWidth: '900px' }}>
+                    <div style={{ height: '40px', background: 'var(--color-border)', borderRadius: '8px', marginBottom: '24px', width: '60%' }}></div>
+                    <div style={{ height: '200px', background: 'var(--color-border)', borderRadius: '16px' }}></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!training) {
+        return (
+            <div className="main-wrapper" style={{ paddingTop: '120px', minHeight: '100vh', textAlign: 'center' }}>
+                <div className="container">
+                    <h1 className="heading-1" style={{ marginBottom: '24px' }}>Training Not Found</h1>
+                    <p style={{ marginBottom: '32px', color: 'var(--color-text-secondary)' }}>
+                        The training program you're looking for doesn't exist.
+                    </p>
+                    <Link href="/" className="btn btn-primary">
+                        Back to Home
+                    </Link>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="main-wrapper">
-            <section className="section bg-surface">
-                <div className="container">
-                    <Link href="/programs" style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '16px', display: 'inline-block' }}>&larr; Back to Programs</Link>
-                    <h1 className="display-text mb-4" style={{ fontSize: '48px' }}>{program.title}</h1>
-                    <p className="body-large" style={{ maxWidth: '700px' }}>{program.desc}</p>
+        <div className="main-wrapper" style={{ paddingTop: '100px', paddingBottom: '80px', background: 'var(--color-background)' }}>
+            {/* Hero Section */}
+            <section style={{
+                background: 'linear-gradient(135deg, var(--color-accent) 0%, #6366f1 100%)',
+                padding: '80px 0',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                {/* Animated Background Pattern */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.1,
+                    backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                    backgroundSize: '30px 30px',
+                    animation: 'float 20s ease-in-out infinite'
+                }}></div>
+
+                <div className="container" style={{ maxWidth: '1000px', position: 'relative', zIndex: 1 }}>
+                    {/* Back Button */}
+                    <button
+                        onClick={() => router.back()}
+                        style={{
+                            background: 'rgba(255,255,255,0.2)',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            color: '#fff',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            marginBottom: '32px',
+                            backdropFilter: 'blur(10px)',
+                            transition: 'all 0.3s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    >
+                        ← Back
+                    </button>
+
+                    {/* Training ID Badge */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <span style={{
+                            display: 'inline-block',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(10px)',
+                            color: '#fff',
+                            padding: '8px 16px',
+                            borderRadius: '999px',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            border: '1px solid rgba(255,255,255,0.3)'
+                        }}>
+                            {training.trainingId}
+                        </span>
+                    </div>
+
+                    {/* Title */}
+                    <h1 className="fade-in-up" style={{
+                        fontSize: '48px',
+                        fontWeight: '700',
+                        color: '#fff',
+                        marginBottom: '24px',
+                        lineHeight: '1.2',
+                        textShadow: '0 2px 20px rgba(0,0,0,0.1)'
+                    }}>
+                        {training.title}
+                    </h1>
+
+                    {/* Summary */}
+                    <p className="fade-in-up delay-1" style={{
+                        fontSize: '20px',
+                        color: 'rgba(255,255,255,0.95)',
+                        lineHeight: '1.6',
+                        marginBottom: '32px',
+                        maxWidth: '800px'
+                    }}>
+                        {training.summary}
+                    </p>
+
+                    {/* Meta Info Cards */}
+                    <div className="fade-in-up delay-2" style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                        <div style={{
+                            background: 'rgba(255,255,255,0.15)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '12px',
+                            padding: '20px 24px'
+                        }}>
+                            <div>
+                                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginBottom: '4px' }}>Duration</div>
+                                <div style={{ fontSize: '16px', fontWeight: '600', color: '#fff' }}>{training.duration}</div>
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'rgba(255,255,255,0.15)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '12px',
+                            padding: '20px 24px'
+                        }}>
+                            <div>
+                                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginBottom: '4px' }}>Target Audience</div>
+                                <div style={{ fontSize: '16px', fontWeight: '600', color: '#fff' }}>{training.targetAudience}</div>
+                            </div>
+                        </div>
+
+                        {training.catalogUrl && (
+                            <a
+                                href={training.catalogUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    background: 'rgba(255,255,255,0.95)',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    padding: '20px 32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    textDecoration: 'none',
+                                    color: 'var(--color-accent)',
+                                    fontWeight: '600',
+                                    fontSize: '16px',
+                                    transition: 'all 0.3s',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                                }}
+                            >
+                                <span>📄</span>
+                                Download Catalog
+                            </a>
+                        )}
+                    </div>
                 </div>
             </section>
 
-            <section className="section">
-                <div className="container">
-                    <div className="grid-2-col" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '64px' }}>
-                        <div>
-                            <h2 className="heading-2 mb-4">Program Overview</h2>
-                            <p className="body-text mb-8">
-                                This intensive program is designed to transform the way you lead. Through a blend of experiential learning, mindfulness practices, and strategic frameworks, you will gain the clarity and confidence needed to drive organizational success.
-                            </p>
+            {/* Content Section */}
+            <section style={{ padding: '80px 0' }}>
+                <div className="container" style={{ maxWidth: '900px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }}>
+                        {/* Main Content Card */}
+                        <div className="fade-in-up delay-3" style={{
+                            background: '#fff',
+                            borderRadius: '24px',
+                            padding: '48px',
+                            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+                            border: '1px solid #f0f0f0'
+                        }}>
+                            <h2 style={{
+                                fontSize: '28px',
+                                fontWeight: '700',
+                                marginBottom: '32px',
+                                color: '#111',
+                                borderBottom: '3px solid var(--color-accent)',
+                                paddingBottom: '16px',
+                                display: 'inline-block'
+                            }}>
+                                Program Details
+                            </h2>
 
-                            <h3 className="text-xl font-bold mb-4">What You Will Learn</h3>
-                            <ul style={{ listStyle: 'disc', paddingLeft: '20px', marginBottom: '40px' }} className="space-y-2">
-                                {program.modules && program.modules.map((mod: string, i: number) => (
-                                    <li key={i} className="body-text">{mod}</li>
-                                ))}
-                                <li className="body-text">Action Planning for Impact</li>
-                            </ul>
+                            {/* Rich HTML Content */}
+                            <div
+                                className="rich-content"
+                                style={{
+                                    fontSize: '16px',
+                                    lineHeight: '1.8',
+                                    color: '#333'
+                                }}
+                                dangerouslySetInnerHTML={{ __html: training.detailedDescription }}
+                            />
                         </div>
 
-                        <div style={{ background: '#f5f5f7', padding: '32px', borderRadius: '18px', alignSelf: 'start' }}>
-                            <h3 className="text-lg font-bold mb-4">Program Details</h3>
-                            <div style={{ marginBottom: '24px' }}>
-                                <p className="text-sm text-gray-500 font-semibold uppercase">Target Audience</p>
-                                <p className="body-text">{program.audience}</p>
-                            </div>
-                            <div style={{ marginBottom: '24px' }}>
-                                <p className="text-sm text-gray-500 font-semibold uppercase">Format</p>
-                                <p className="body-text">In-Person or Virtual</p>
-                            </div>
-                            <Link href="/register" className="btn btn-primary" style={{ width: '100%' }}>Register Now</Link>
+                        {/* CTA Card */}
+                        <div className="fade-in-up delay-4" style={{
+                            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                            borderRadius: '24px',
+                            padding: '48px',
+                            textAlign: 'center',
+                            border: '2px solid #e0e0e0'
+                        }}>
+                            <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px', color: '#111' }}>
+                                Ready to Transform Your Team?
+                            </h3>
+                            <p style={{ fontSize: '16px', color: '#666', marginBottom: '32px', lineHeight: '1.6' }}>
+                                Get in touch with us to discuss how this program can benefit your organization.
+                            </p>
+                            <Link
+                                href="/contact"
+                                className="btn btn-primary"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '16px 32px',
+                                    fontSize: '16px',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Contact Us <span>→</span>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* Floating Animation Keyframes */}
+            <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+
+        .rich-content h1, .rich-content h2, .rich-content h3 {
+          margin-top: 32px;
+          margin-bottom: 16px;
+          font-weight: 700;
+          color: #111;
+        }
+
+        .rich-content h1 { font-size: 32px; }
+        .rich-content h2 { font-size: 28px; }
+        .rich-content h3 { font-size: 24px; }
+
+        .rich-content p {
+          margin-bottom: 16px;
+        }
+
+        .rich-content ul, .rich-content ol {
+          margin-left: 24px;
+          margin-bottom: 16px;
+        }
+
+        .rich-content li {
+          margin-bottom: 8px;
+        }
+
+        .rich-content strong, .rich-content b {
+          font-weight: 700;
+          color: #111;
+        }
+
+        .rich-content em, .rich-content i {
+          font-style: italic;
+        }
+
+        .rich-content a {
+          color: var(--color-accent);
+          text-decoration: underline;
+        }
+
+        .rich-content a:hover {
+          text-decoration: none;
+        }
+      `}</style>
         </div>
     );
 }

@@ -6,6 +6,7 @@ export default function Footer() {
             <div className="container">
                 <div className="footer-grid">
                     <div>
+                        <img src="/logo.png" alt="Mindful Consulting" style={{ height: '60px', width: 'auto', marginBottom: '16px' }} />
                         <h3 className="heading-2" style={{ marginBottom: '16px', fontSize: '20px' }}>Mindful Consulting</h3>
                         <p className="body-text" style={{ color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
                             Developing Mindful Leaders for Complex Organizations.
