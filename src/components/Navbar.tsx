@@ -1,11 +1,20 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
+
+    const isActive = (path: string) => {
+        if (path === '/') {
+            return pathname === '/';
+        }
+        return pathname.startsWith(path);
+    };
 
     return (
         <>
@@ -17,11 +26,36 @@ export default function Navbar() {
                     </Link>
 
                     <div className="nav-links">
-                        <Link href="/about" className="nav-link">About</Link>
-                        <Link href="/programs" className="nav-link">Programs</Link>
-                        <Link href="/calendar" className="nav-link">Calendar</Link>
-                        <Link href="/insights" className="nav-link">Insights</Link>
-                        <Link href="/contact" className="nav-link">Contact</Link>
+                        <Link
+                            href="/about"
+                            className={`nav-link ${isActive('/about') ? 'active' : ''}`}
+                        >
+                            About
+                        </Link>
+                        <Link
+                            href="/programs"
+                            className={`nav-link ${isActive('/programs') ? 'active' : ''}`}
+                        >
+                            Programs
+                        </Link>
+                        <Link
+                            href="/calendar"
+                            className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
+                        >
+                            Calendar
+                        </Link>
+                        <Link
+                            href="/insights"
+                            className={`nav-link ${isActive('/insights') ? 'active' : ''}`}
+                        >
+                            Insights
+                        </Link>
+                        <Link
+                            href="/contact"
+                            className={`nav-link ${isActive('/contact') ? 'active' : ''}`}
+                        >
+                            Contact
+                        </Link>
                     </div>
 
                     <div className="navbar-cta-desktop">
@@ -52,11 +86,41 @@ export default function Navbar() {
 
             {/* Mobile Menu Overlay */}
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`}>
-                <Link href="/about" className="nav-link" onClick={() => setIsMenuOpen(false)}>About</Link>
-                <Link href="/programs" className="nav-link" onClick={() => setIsMenuOpen(false)}>Programs</Link>
-                <Link href="/calendar" className="nav-link" onClick={() => setIsMenuOpen(false)}>Calendar</Link>
-                <Link href="/insights" className="nav-link" onClick={() => setIsMenuOpen(false)}>Insights</Link>
-                <Link href="/contact" className="nav-link" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+                <Link
+                    href="/about"
+                    className={`nav-link ${isActive('/about') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    About
+                </Link>
+                <Link
+                    href="/programs"
+                    className={`nav-link ${isActive('/programs') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Programs
+                </Link>
+                <Link
+                    href="/calendar"
+                    className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Calendar
+                </Link>
+                <Link
+                    href="/insights"
+                    className={`nav-link ${isActive('/insights') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Insights
+                </Link>
+                <Link
+                    href="/contact"
+                    className={`nav-link ${isActive('/contact') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Contact
+                </Link>
                 <Link href="/register" className="btn btn-primary w-full text-center justify-center mt-2" onClick={() => setIsMenuOpen(false)}>
                     Get Started
                 </Link>

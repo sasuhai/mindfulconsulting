@@ -310,6 +310,23 @@ button {
   color: var(--color-text-primary);
 }
 
+.nav-link.active {
+  color: var(--color-accent);
+  font-weight: 600;
+  position: relative;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
 .brand-logo {
   font-size: 16px;
   font-weight: 600;
@@ -639,6 +656,7 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
 /* Rich Text Editor Styles */
 .rich-editor-wrapper {
   min-height: 400px;
