@@ -22,7 +22,30 @@ export default function Navbar() {
                 <div className="navbar-content">
                     <Link href="/" className="brand-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <img src="/logo.png" alt="Mindful Consulting" style={{ height: '40px', width: 'auto' }} />
-                        <span style={{ fontWeight: '700', fontSize: '18px' }}>Mindful Consulting</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{
+                                fontFamily: 'Georgia, "Times New Roman", serif',
+                                fontWeight: '400',
+                                fontSize: '20px',
+                                lineHeight: '1',
+                                color: 'var(--color-text-primary)'
+                            }}>
+                                Mindful Consulting
+                            </span>
+                            <span style={{
+                                fontFamily: 'system-ui, -apple-system, sans-serif',
+                                fontSize: '9px',
+                                letterSpacing: '1.5px',
+                                textTransform: 'uppercase',
+                                color: '#7a8a6f',
+                                lineHeight: '1',
+                                fontWeight: '400',
+                                textAlign: 'center',
+                                display: 'block'
+                            }}>
+                                Growth with Presence
+                            </span>
+                        </div>
                     </Link>
 
                     <div className="nav-links">

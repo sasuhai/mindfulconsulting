@@ -194,7 +194,7 @@ function ProgramsContent() {
                     borderTop: '1px solid rgba(39,39,42,0.5)'
                 }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: '32px', fontWeight: '600', marginBottom: '16px' }}>
+                        <h2 style={{ fontSize: '32px', fontWeight: '600', marginBottom: '16px', color: '#fff' }}>
                             Ready to Transform Your Leadership?
                         </h2>
                         <p style={{ fontSize: '18px', color: '#a1a1aa', marginBottom: '32px' }}>
@@ -218,14 +218,16 @@ function ProgramsContent() {
                 </section>
 
                 <style jsx global>{`
-                    .training-content h1 { font-size: 32px; font-weight: 600; color: #fff; margin: 32px 0 16px; }
-                    .training-content h2 { font-size: 28px; font-weight: 600; color: #fff; margin: 28px 0 14px; }
-                    .training-content h3 { font-size: 24px; font-weight: 600; color: #fff; margin: 24px 0 12px; }
-                    .training-content p { margin: 16px 0; }
+                    .training-content h1 { font-size: 32px; font-weight: 600; color: #fff !important; margin: 32px 0 16px; }
+                    .training-content h2 { font-size: 28px; font-weight: 600; color: #fff !important; margin: 28px 0 14px; }
+                    .training-content h3 { font-size: 24px; font-weight: 600; color: #fff !important; margin: 24px 0 12px; }
+                    .training-content p { margin: 16px 0; color: #d4d4d8 !important; }
                     .training-content ul, .training-content ol { margin: 16px 0; padding-left: 24px; }
-                    .training-content li { margin: 8px 0; }
-                    .training-content strong { color: #fff; font-weight: 600; }
-                    .training-content a { color: var(--color-accent); text-decoration: underline; }
+                    .training-content li { margin: 8px 0; color: #d4d4d8 !important; }
+                    .training-content strong { color: #fff !important; font-weight: 600; }
+                    .training-content a { color: var(--color-accent) !important; text-decoration: underline; }
+                    .training-content * { color: #d4d4d8 !important; }
+                    .training-content h1, .training-content h2, .training-content h3, .training-content h4, .training-content h5, .training-content h6 { color: #fff !important; }
                 `}</style>
             </div>
         );

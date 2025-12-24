@@ -1,52 +1,268 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect } from 'react';
 import TrainingsGrid from '@/components/TrainingsGrid';
 
 export default function Home() {
+  useEffect(() => {
+    // Trigger animations on mount
+    const heroImage = document.getElementById('heroImage');
+    const heroOverlay = document.getElementById('heroOverlay');
+    const heroBackgroundText = document.getElementById('heroBackgroundText');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroSubtitle = document.getElementById('heroSubtitle');
+    const heroButton = document.getElementById('heroButton');
+    const heroLogos = document.getElementById('heroLogos');
+
+    setTimeout(() => {
+      if (heroImage) {
+        heroImage.style.opacity = '1';
+        heroImage.style.transform = 'scale(1) scaleX(-1)';
+        heroImage.style.filter = 'brightness(0.7) blur(0px)';
+      }
+      if (heroOverlay) heroOverlay.style.opacity = '1';
+      if (heroBackgroundText) {
+        heroBackgroundText.style.opacity = '1';
+        heroBackgroundText.style.transform = 'scale(1)';
+      }
+    }, 100);
+
+    setTimeout(() => {
+      if (heroTitle) {
+        heroTitle.style.opacity = '1';
+        heroTitle.style.transform = 'translateY(0) translateX(0)';
+        heroTitle.style.filter = 'blur(0)';
+      }
+    }, 800);
+
+    setTimeout(() => {
+      if (heroSubtitle) {
+        heroSubtitle.style.opacity = '1';
+        heroSubtitle.style.transform = 'translateY(0) translateX(0)';
+        heroSubtitle.style.filter = 'blur(0)';
+      }
+    }, 1200);
+
+    setTimeout(() => {
+      if (heroButton) {
+        heroButton.style.opacity = '1';
+        heroButton.style.transform = 'translateY(0)';
+      }
+    }, 1600);
+
+    setTimeout(() => {
+      if (heroLogos) {
+        heroLogos.style.opacity = '1';
+        heroLogos.style.transform = 'translateY(0)';
+      }
+    }, 2000);
+  }, []);
+
   return (
     <div className="main-wrapper">
-      {/* Hero Section */}
-      <section className="section" style={{ paddingTop: '160px', paddingBottom: '120px', textAlign: 'left', overflow: 'hidden' }}>
-        <div className="container grid-stack-mobile">
-          {/* Left Content */}
-          <div style={{ maxWidth: '700px' }}>
-            <div className="fade-in-up hero-badge" style={{ display: 'inline-flex', alignItems: 'center', padding: '6px 12px', borderRadius: '999px', border: '1px solid #e5e5e5', marginBottom: '32px', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#555' }}>
-              <span style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%', marginRight: '8px' }}></span>
-              Leadership Development
-            </div>
+      {/* Hero Section - Fullscreen */}
+      <section style={{
+        position: 'relative',
+        minHeight: '100vh',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+      }}>
+        {/* Background Image */}
+        <img
+          id="heroImage"
+          src="/hero.png"
+          alt="Mindful Consulting Leadership"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            zIndex: 0,
+            opacity: 0,
+            transform: 'scale(1.25) scaleX(-1)',
+            filter: 'brightness(0.56) blur(10px)',
+            transition: 'all 2s ease-out'
+          }}
+        />
 
-            <h1 className="display-hero mb-6 fade-in-up delay-1 hero-heading" style={{ marginBottom: '32px', color: '#111' }}>
-              Developing Mindful Leaders for Complex Organizations
-            </h1>
+        {/* Overlay */}
+        <div
+          id="heroOverlay"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to right, rgba(250,250,250,0.5) 0%, rgba(250,250,250,0.3) 40%, rgba(250,250,250,0.1) 70%, rgba(250,250,250,0) 100%)',
+            zIndex: 10,
+            opacity: 0,
+            transition: 'opacity 1.5s ease-out'
+          }}
+        />
 
-            <p className="body-large mb-8 fade-in-up delay-2" style={{ marginBottom: '48px', fontSize: '20px', lineHeight: '1.6' }}>
-              We help senior leaders and organizations navigate change with clarity, calm, and confidence through mindfulness-based leadership development.
-            </p>
 
-            <div className="flex items-center gap-4 fade-in-up delay-2" style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-              <Link href="/programs" className="btn btn-primary btn-icon-anim" style={{ height: '56px', padding: '0 32px', fontSize: '16px' }}>
-                Start Journey <span className="icon-arrow">&rarr;</span>
-              </Link>
-            </div>
+        {/* Large Background Text */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 15,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-start',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          paddingBottom: '5vh',
+          paddingLeft: '2vw'
+        }}>
+          <div
+            id="heroBackgroundText"
+            style={{
+              fontSize: 'clamp(120px, 20vw, 280px)',
+              fontWeight: '900',
+              color: 'rgba(255,255,255,0.15)',
+              letterSpacing: '-0.05em',
+              lineHeight: '0.9',
+              textTransform: 'uppercase',
+              userSelect: 'none',
+              opacity: 0,
+              transform: 'scale(1.2)',
+              transition: 'all 2s ease-out'
+            }}
+          >
+            MINDFUL
+          </div>
+        </div>
 
-            {/* HRDCorp Certification Logos */}
-            <div className="fade-in-up delay-3" style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <img src="/hrdcorp-claimable.png" alt="HRDCorp Claimable" style={{ height: '64px', width: 'auto' }} />
-              <img src="/hrdcorp-registered.png" alt="HRDCorp Registered Training Provider" style={{ height: '64px', width: 'auto' }} />
-            </div>
+        {/* Content */}
+        <div style={{
+          position: 'relative',
+          zIndex: 20,
+          maxWidth: '1200px',
+          padding: '0 48px',
+          width: '100%',
+          margin: '0 auto'
+        }}>
+          {/* Badge */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '8px 16px',
+            borderRadius: '999px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            marginBottom: '32px',
+            fontSize: '12px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: '#fff',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <span style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%', marginRight: '8px' }}></span>
+            Leadership Development
           </div>
 
-          {/* Right Content - Hero Image */}
-          <div className="fade-in-up delay-2" style={{ position: 'relative' }}>
-            <div className="hero-image-wrapper">
-              <img src="/hero.png" alt="Malaysian Corporate Leadership" style={{ width: '100%', height: 'auto', display: 'block' }} />
-              {/* Optional overlay gradient if needed for text readability, but not needed here as image is on right */}
-            </div>
+          {/* Title */}
+          <div
+            id="heroTitle"
+            style={{
+              opacity: 0,
+              transform: 'translateY(64px) translateX(-30px)',
+              filter: 'blur(10px)',
+              transition: 'all 1.4s ease-out',
+              transitionDelay: '1200ms'
+            }}
+          >
+            <h1 style={{
+              fontSize: 'clamp(40px, 6vw, 80px)',
+              fontWeight: '600',
+              lineHeight: '1.1',
+              letterSpacing: '-0.03em',
+              marginBottom: '32px',
+              color: '#fff',
+              maxWidth: '900px'
+            }}>
+              Growth with Presence
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <div
+            id="heroSubtitle"
+            style={{
+              opacity: 0,
+              transform: 'translateY(80px) translateX(-40px)',
+              filter: 'blur(10px)',
+              transition: 'all 1.4s ease-out',
+              transitionDelay: '1400ms'
+            }}
+          >
+            <p style={{
+              maxWidth: '700px',
+              fontSize: 'clamp(18px, 2vw, 22px)',
+              color: '#fff',
+              marginBottom: '20px',
+              lineHeight: '1.6'
+            }}>
+              Mindful Consulting partners with organizations and individuals to develop conscious, effective leadership grounded in presence, clarity, and human connection.
+            </p>
+            <p style={{
+              maxWidth: '700px',
+              fontSize: 'clamp(16px, 1.8vw, 18px)',
+              color: 'rgba(255,255,255,0.9)',
+              marginBottom: '48px',
+              lineHeight: '1.6'
+            }}>
+              We believe leadership is not a fixed destination, but a continuous process of growth—shaped by awareness, thoughtful dialogue, and purposeful action. Our work integrates mindfulness with practical business realities, helping leaders navigate complexity while staying grounded, empathetic, and decisive.
+            </p>
+          </div>
+
+          {/* Button */}
+          <div
+            id="heroButton"
+            style={{
+              marginBottom: '48px',
+              opacity: 0,
+              transform: 'translateY(40px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <Link href="/programs" className="btn btn-primary btn-icon-anim" style={{
+              height: '56px',
+              padding: '0 32px',
+              fontSize: '16px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              Start Journey <span className="icon-arrow">&rarr;</span>
+            </Link>
+          </div>
+
+          {/* HRDCorp Certification Logos */}
+          <div
+            id="heroLogos"
+            style={{
+              display: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              opacity: 0,
+              transform: 'translateY(40px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <img src="/hrdcorp-claimable.png" alt="HRDCorp Claimable" style={{ height: '64px', width: 'auto' }} />
+            <img src="/hrdcorp-registered.png" alt="HRDCorp Registered Training Provider" style={{ height: '64px', width: 'auto' }} />
           </div>
         </div>
       </section>
 
       {/* Trust Indicators / Industries */}
-      <section className="section" style={{ paddingTop: '0', paddingBottom: '80px', textAlign: 'center' }}>
+      <section className="section" style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center' }}>
         <div className="container">
           <p className="text-sm font-medium text-secondary mb-8 trust-text" style={{ color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
             TRUSTED BY LEADING INDUSTRIES

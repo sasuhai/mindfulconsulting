@@ -97,7 +97,7 @@ export default function AboutPage() {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        objectPosition: 'center',
+                        objectPosition: 'left center',
                         zIndex: 0,
                         opacity: 0,
                         transform: 'scale(1.25)',
@@ -168,7 +168,7 @@ export default function AboutPage() {
                                 marginBottom: '24px',
                                 color: '#fff'
                             }}>
-                                Growth with Presence
+                                Our Services
                             </h1>
                         </div>
 
@@ -187,20 +187,65 @@ export default function AboutPage() {
                                 maxWidth: '800px',
                                 fontSize: 'clamp(16px, 2vw, 18px)',
                                 color: '#d4d4d8',
-                                marginBottom: '16px',
+                                marginBottom: '32px',
                                 lineHeight: '1.6'
                             }}>
-                                Mindful Consulting partners with organizations and individuals to develop conscious, effective leadership grounded in presence, clarity, and human connection.
+                                At Mindful Consulting, we create safe, thoughtful spaces where leaders can pause, reflect, and move forward with presence—supporting growth that is both human and sustainable.
                             </p>
+
+                            <h2 style={{
+                                fontSize: 'clamp(24px, 3vw, 32px)',
+                                fontWeight: '600',
+                                color: '#fff',
+                                marginBottom: '16px',
+                                marginTop: '40px'
+                            }}>
+                                Workshops
+                            </h2>
                             <p style={{
                                 maxWidth: '800px',
                                 fontSize: 'clamp(15px, 1.8vw, 17px)',
                                 color: '#a1a1aa',
-                                marginBottom: '32px',
+                                marginBottom: '20px',
                                 lineHeight: '1.6'
                             }}>
-                                We believe leadership is not a fixed destination, but a continuous process of growth—shaped by awareness, thoughtful dialogue, and purposeful action. Our work integrates mindfulness with practical business realities, helping leaders navigate complexity while staying grounded, empathetic, and decisive.
+                                Designed to be interactive, reflective, and immediately applicable:
                             </p>
+                            <ul style={{
+                                maxWidth: '800px',
+                                fontSize: 'clamp(15px, 1.8vw, 17px)',
+                                color: '#d4d4d8',
+                                marginBottom: '32px',
+                                lineHeight: '1.8',
+                                paddingLeft: '20px'
+                            }}>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Leadership Essentials</strong> – Building self-awareness, trust, and influence</li>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Leading Business Challenges</strong> – Navigating uncertainty, change, and complexity</li>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Design Thinking</strong> – Human-centered problem solving and innovation</li>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Difficult Dialogue</strong> – Leading courageous and meaningful conversations</li>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Synergy 101</strong> – Strengthening collaboration and team effectiveness</li>
+                            </ul>
+
+                            <h2 style={{
+                                fontSize: 'clamp(24px, 3vw, 32px)',
+                                fontWeight: '600',
+                                color: '#fff',
+                                marginBottom: '16px',
+                                marginTop: '32px'
+                            }}>
+                                Coaching
+                            </h2>
+                            <ul style={{
+                                maxWidth: '800px',
+                                fontSize: 'clamp(15px, 1.8vw, 17px)',
+                                color: '#d4d4d8',
+                                marginBottom: '32px',
+                                lineHeight: '1.8',
+                                paddingLeft: '20px'
+                            }}>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Individual Coaching</strong> – Supporting leaders to reflect, grow, and lead with intention</li>
+                                <li style={{ marginBottom: '12px' }}><strong style={{ color: '#fff' }}>Group Coaching</strong> – Creating shared learning, alignment, and collective accountability</li>
+                            </ul>
                         </div>
                         {/* Button */}
                         <div

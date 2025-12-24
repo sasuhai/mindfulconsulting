@@ -195,6 +195,11 @@ export default function AdminTrainings() {
     const [catalogFile, setCatalogFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null; title: string }>({
+        show: false,
+        id: null,
+        title: ''
+    });
 
     useEffect(() => {
         fetchTrainings();
@@ -295,12 +300,17 @@ export default function AdminTrainings() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this training?')) return;
+    const handleDelete = (id: string, title: string) => {
+        setDeleteConfirm({ show: true, id, title });
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteConfirm.id) return;
 
         try {
-            await deleteDoc(doc(db, 'trainings', id));
+            await deleteDoc(doc(db, 'trainings', deleteConfirm.id));
             alert('Training deleted successfully!');
+            setDeleteConfirm({ show: false, id: null, title: '' });
             fetchTrainings();
         } catch (error) {
             console.error('Error deleting training:', error);
@@ -665,7 +675,7 @@ export default function AdminTrainings() {
                                     </a>
                                 )}
                                 <button
-                                    onClick={() => training.id && handleDelete(training.id)}
+                                    onClick={() => training.id && handleDelete(training.id, training.title)}
                                     style={{
                                         padding: '8px 12px',
                                         fontSize: '13px',
@@ -708,6 +718,97 @@ export default function AdminTrainings() {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm.show && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'var(--color-surface)',
+                        borderRadius: '16px',
+                        padding: '32px',
+                        maxWidth: '500px',
+                        width: '100%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                        border: '1px solid var(--color-border)'
+                    }}>
+                        <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '16px' }}>⚠️</div>
+                        <h3 style={{
+                            fontSize: '24px',
+                            fontWeight: '600',
+                            marginBottom: '16px',
+                            textAlign: 'center',
+                            color: 'var(--color-text-primary)'
+                        }}>
+                            Delete Training?
+                        </h3>
+                        <p style={{
+                            fontSize: '16px',
+                            color: 'var(--color-text-secondary)',
+                            marginBottom: '24px',
+                            textAlign: 'center',
+                            lineHeight: '1.5'
+                        }}>
+                            Are you sure you want to delete <strong style={{ color: 'var(--color-text-primary)' }}>"{deleteConfirm.title}"</strong>?
+                            <br />This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setDeleteConfirm({ show: false, id: null, title: '' })}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'transparent',
+                                    color: 'var(--color-text-primary)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'var(--color-border)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: '#dc2626',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#b91c1c';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#dc2626';
+                                }}
+                            >
+                                Delete Training
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

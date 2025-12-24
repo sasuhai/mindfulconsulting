@@ -5,12 +5,33 @@ export default function Footer() {
         <footer className="footer">
             <div className="container">
                 <div className="footer-grid">
-                    <div>
-                        <img src="/logo.png" alt="Mindful Consulting" style={{ height: '60px', width: 'auto', marginBottom: '16px' }} />
-                        <h3 className="heading-2" style={{ marginBottom: '16px', fontSize: '20px' }}>Mindful Consulting</h3>
-                        <p className="body-text" style={{ color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                            Developing Mindful Leaders for Complex Organizations.
-                        </p>
+                    <div style={{ textAlign: 'center' }}>
+                        <img src="/logo.png" alt="Mindful Consulting" style={{ height: '78px', width: 'auto', marginBottom: '16px', display: 'inline-block' }} />
+                        <div style={{ marginBottom: '16px' }}>
+                            <h3 style={{
+                                fontFamily: 'Georgia, "Times New Roman", serif',
+                                fontWeight: '400',
+                                fontSize: '24px',
+                                lineHeight: '1.2',
+                                marginBottom: '4px',
+                                color: 'var(--color-text-primary)',
+                                textAlign: 'center'
+                            }}>
+                                Mindful Consulting
+                            </h3>
+                            <p style={{
+                                fontFamily: 'system-ui, -apple-system, sans-serif',
+                                fontSize: '11px',
+                                letterSpacing: '1.5px',
+                                textTransform: 'uppercase',
+                                color: '#7a8a6f',
+                                fontWeight: '400',
+                                marginBottom: '12px',
+                                textAlign: 'center'
+                            }}>
+                                Growth with Presence
+                            </p>
+                        </div>
                     </div>
 
                     <div>
