@@ -110,7 +110,7 @@ export default function TrainingsGrid() {
                         </div>
                     </div>
                     <Link
-                        href={`/programs/${training.id}`}
+                        href={`/programs?id=${training.id}`}
                         className="btn-text"
                         style={{
                             display: 'inline-flex',
