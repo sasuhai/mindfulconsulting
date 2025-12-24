@@ -87,8 +87,10 @@ export default function Navbar() {
                         </Link>
                     </div>
 
-                    {/* Theme Toggle */}
-                    <ThemeToggle />
+                    {/* Theme Toggle - Desktop Only */}
+                    <div className="theme-toggle-desktop">
+                        <ThemeToggle />
+                    </div>
 
                     {/* Mobile Menu Button - Hamburger */}
                     <button
@@ -144,6 +146,12 @@ export default function Navbar() {
                 >
                     Contact
                 </Link>
+
+                {/* Theme Toggle in Mobile Menu */}
+                <div style={{ padding: '12px 0', borderTop: '1px solid var(--color-border)', marginTop: '8px', paddingTop: '16px' }}>
+                    <ThemeToggle />
+                </div>
+
                 <Link href="/register" className="btn btn-primary w-full text-center justify-center mt-2" onClick={() => setIsMenuOpen(false)}>
                     Get Started
                 </Link>

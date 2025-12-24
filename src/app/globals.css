@@ -282,8 +282,18 @@ button {
   display: none;
 }
 
+/* Hide theme toggle on mobile navbar */
+.theme-toggle-desktop {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .navbar-cta-desktop {
+    display: flex;
+    align-items: center;
+  }
+
+  .theme-toggle-desktop {
     display: flex;
     align-items: center;
   }
