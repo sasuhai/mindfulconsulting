@@ -21,7 +21,7 @@ export default function Navbar() {
             <nav className="navbar glass">
                 <div className="navbar-content">
                     <Link href="/" className="brand-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src="/logo.png" alt="Mindful Consulting" style={{ height: '40px', width: 'auto' }} />
+                        <img src="/logo.png?v=2" alt="Mindful Consulting" style={{ height: '40px', width: 'auto' }} />
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             <span style={{
                                 fontFamily: 'Georgia, "Times New Roman", serif',

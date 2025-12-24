@@ -6,7 +6,7 @@ export default function Footer() {
             <div className="container">
                 <div className="footer-grid">
                     <div style={{ textAlign: 'center' }}>
-                        <img src="/logo.png" alt="Mindful Consulting" style={{ height: '78px', width: 'auto', marginBottom: '16px', display: 'inline-block' }} />
+                        <img src="/logo.png?v=2" alt="Mindful Consulting" style={{ height: '78px', width: 'auto', marginBottom: '16px', display: 'inline-block' }} />
                         <div style={{ marginBottom: '16px' }}>
                             <h3 style={{
                                 fontFamily: 'Georgia, "Times New Roman", serif',
