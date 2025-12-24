@@ -757,3 +757,35 @@ button {
 .rdw-dropdownoption-highlighted {
   background: var(--color-surface-hover) !important;
 }
+/* About Page Profile Grid - Responsive */
+.about-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: start;
+  margin-bottom: 96px;
+}
+
+/* On mobile, ensure image comes first */
+@media (max-width: 767px) {
+  .about-profile-grid {
+    gap: 32px;
+  }
+  
+  /* Image container should be first in visual order on mobile */
+  .about-profile-grid > div:first-child {
+    order: 1;
+  }
+  
+  .about-profile-grid > div:last-child {
+    order: 2;
+  }
+}
+
+/* Desktop: two columns */
+@media (min-width: 768px) {
+  .about-profile-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+}

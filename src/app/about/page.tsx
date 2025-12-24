@@ -334,7 +334,7 @@ export default function AboutPage() {
             <section style={{ position: 'relative', background: '#09090b', borderTop: '1px solid rgba(39,39,42,0.5)', padding: '128px 0' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
                     {/* Main Content - Two Column Layout */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'start', marginBottom: '96px' }}>
+                    <div className="about-profile-grid">
                         {/* Left: Image with Floating Stats */}
                         <div className="parallax-element" style={{
                             opacity: 0,
