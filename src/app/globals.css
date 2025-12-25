@@ -789,3 +789,19 @@ button {
     gap: 64px;
   }
 }
+
+/* Calendar Mobile Responsiveness */
+@media (max-width: 768px) {
+    .calendar-grid-container {
+        display: none !important;
+    }
+    .calendar-mobile-message {
+        display: block !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .calendar-mobile-message {
+        display: none !important;
+    }
+}

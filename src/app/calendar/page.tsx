@@ -627,8 +627,14 @@ function CalendarView({ events, currentDate, onNavigate, accentColor, getStatusC
                     </button>
                 </div>
 
+                {/* Mobile Message - Only shown on small screens */}
+                <div className="calendar-mobile-message" style={{ display: 'none', padding: '24px', background: '#eff6ff', border: '2px solid #3b82f6', borderRadius: '12px', textAlign: 'center', margin: '24px 0' }}>
+                    <p style={{ color: '#1e40af', fontSize: '14px', fontWeight: '500', margin: 0 }}>📱 The calendar grid is best viewed on larger screens.</p>
+                    <p style={{ color: '#1e40af', fontSize: '14px', fontWeight: '500', margin: '8px 0 0 0' }}>Please scroll down to see upcoming events in list format.</p>
+                </div>
+
                 {/* Calendar Grid */}
-                <div style={{
+                <div className="calendar-grid-container" style={{
                     background: '#fff',
                     borderRadius: '16px',
                     overflow: 'hidden',
