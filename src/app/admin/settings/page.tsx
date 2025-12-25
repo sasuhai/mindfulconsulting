@@ -84,7 +84,12 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="main-wrapper" style={{ paddingTop: '120px', padding: '120px 24px 40px', maxWidth: '800px', margin: '0 auto' }}>
+        <div className="main-wrapper" style={{
+            paddingTop: '120px',
+            padding: '120px 16px 40px',
+            maxWidth: '800px',
+            margin: '0 auto'
+        }}>
             {/* Header */}
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '32px', fontWeight: '600', marginBottom: '8px', color: '#1a1a1a' }}>
@@ -363,6 +368,18 @@ export default function SettingsPage() {
                     </button>
                 </div>
             </div>
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    code {
+                        font-size: 11px !important;
+                        word-break: break-all;
+                    }
+                    pre {
+                        font-size: 10px !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
