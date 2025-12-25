@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import './dark-mode-overrides.css';
@@ -49,11 +49,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+};
 
-  // Manifest
-  manifest: '/site.webmanifest',
-
-  // Theme color
+export const viewport: Viewport = {
   themeColor: '#7a8a6f',
 };
 

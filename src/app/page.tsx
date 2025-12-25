@@ -230,15 +230,17 @@ export default function Home() {
               transition: 'all 1s ease-out'
             }}
           >
-            <Link href="/programs" className="btn btn-primary btn-icon-anim" style={{
+            <Link href="/mission" className="btn btn-primary btn-icon-anim" style={{
               height: '56px',
               padding: '0 32px',
               fontSize: '16px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              background: '#3b82f6',
+              color: '#fff'
             }}>
-              Start Journey <span className="icon-arrow">&rarr;</span>
+              Our Mission <span className="icon-arrow">&rarr;</span>
             </Link>
           </div>
 

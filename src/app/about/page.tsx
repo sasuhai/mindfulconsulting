@@ -84,7 +84,7 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div style={{ minHeight: '100vh', background: '#09090b', color: '#fafafa', fontFamily: 'Inter, sans-serif', overflowX: 'hidden' }}>
+        <div style={{ minHeight: '100vh', background: '#09090b', color: '#fafafa', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', overflowX: 'hidden' }}>
             {/* HERO SECTION */}
             <section style={{ position: 'relative', minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img
@@ -264,18 +264,18 @@ export default function AboutPage() {
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '16px',
-                                    background: '#27272a',
+                                    background: '#3b82f6',
                                     color: '#fff',
                                     fontWeight: '500',
                                     borderRadius: '999px',
                                     padding: '8px 24px 8px 8px',
                                     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-                                    border: '1px solid rgba(63,63,70,0.3)',
+                                    border: '1px solid rgba(59,130,246,0.3)',
                                     textDecoration: 'none',
                                     transition: 'all 0.3s'
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#3f3f46'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = '#27272a'}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}
                             >
                                 <span style={{
                                     display: 'inline-flex',

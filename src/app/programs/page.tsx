@@ -55,7 +55,7 @@ function ProgramsContent() {
     // Show detail view if training ID is in URL
     if (trainingId && training) {
         return (
-            <div style={{ minHeight: '100vh', background: '#09090b', color: '#fafafa', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ minHeight: '100vh', background: '#09090b', color: '#fafafa', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>
                 {/* Hero Section */}
                 <section style={{
                     position: 'relative',

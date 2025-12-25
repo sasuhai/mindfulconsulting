@@ -56,6 +56,12 @@ export default function Navbar() {
                             About
                         </Link>
                         <Link
+                            href="/mission"
+                            className={`nav-link ${isActive('/mission') ? 'active' : ''}`}
+                        >
+                            Mission
+                        </Link>
+                        <Link
                             href="/programs"
                             className={`nav-link ${isActive('/programs') ? 'active' : ''}`}
                         >
@@ -117,6 +123,13 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                 >
                     About
+                </Link>
+                <Link
+                    href="/mission"
+                    className={`nav-link ${isActive('/mission') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Mission
                 </Link>
                 <Link
                     href="/programs"

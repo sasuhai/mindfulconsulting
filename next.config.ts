@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Removed 'output: export' to enable API routes for Google Photos integration
+  // Static export doesn't support server-side API routes
   trailingSlash: true,
   images: {
     unoptimized: true,

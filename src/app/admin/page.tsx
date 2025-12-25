@@ -30,12 +30,36 @@ const adminSections: AdminCard[] = [
         available: true
     },
     {
+        title: 'Calendar Events',
+        description: 'Manage workshops, training sessions, and coaching availability',
+        icon: '📅',
+        href: '/admin/calendar',
+        color: '#5a7c8d',
+        available: true
+    },
+    {
+        title: 'Photo Gallery',
+        description: 'Sync photos from iCloud and manage gallery captions',
+        icon: '📸',
+        href: '/admin/gallery',
+        color: '#6a7a5f',
+        available: true
+    },
+    {
+        title: 'Privacy Policy',
+        description: 'Edit privacy policy content and contact information',
+        icon: '🔒',
+        href: '/admin/privacy',
+        color: '#6b7c5b',
+        available: true
+    },
+    {
         title: 'Settings',
-        description: 'Configure site settings, user preferences, and system options',
+        description: 'Manage contact info, phone number, address, and admin passcode',
         icon: '⚙️',
         href: '/admin/settings',
         color: '#5b7c8d',
-        available: false
+        available: true
     }
 ];
 
