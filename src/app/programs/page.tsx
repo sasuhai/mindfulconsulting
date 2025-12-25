@@ -252,9 +252,115 @@ function ProgramsContent() {
             <section className="section bg-surface text-center">
                 <div className="container">
                     <h1 className="heading-1 mb-4">Our Training Programs</h1>
-                    <p className="body-large" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    <p className="body-large" style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '48px' }}>
                         Transformative learning experiences designed for the modern leader.
                     </p>
+
+                    {/* Program Navigation Buttons */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '16px',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap',
+                        maxWidth: '900px',
+                        margin: '0 auto'
+                    }}>
+                        <Link
+                            href="/programs/leadership"
+                            style={{
+                                flex: '1',
+                                minWidth: '250px',
+                                padding: '24px 32px',
+                                background: 'linear-gradient(135deg, var(--color-accent) 0%, #6b8e6f 100%)',
+                                color: '#fff',
+                                textDecoration: 'none',
+                                borderRadius: '12px',
+                                fontWeight: '600',
+                                fontSize: '16px',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <span style={{ fontSize: '24px' }}>🎯</span>
+                            Leadership Development
+                        </Link>
+
+                        <Link
+                            href="/programs/executive"
+                            style={{
+                                flex: '1',
+                                minWidth: '250px',
+                                padding: '24px 32px',
+                                background: 'linear-gradient(135deg, #8b7355 0%, #6b5d4f 100%)',
+                                color: '#fff',
+                                textDecoration: 'none',
+                                borderRadius: '12px',
+                                fontWeight: '600',
+                                fontSize: '16px',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <span style={{ fontSize: '24px' }}>👔</span>
+                            Executive Coaching
+                        </Link>
+
+                        <Link
+                            href="/programs/team"
+                            style={{
+                                flex: '1',
+                                minWidth: '250px',
+                                padding: '24px 32px',
+                                background: 'linear-gradient(135deg, #5b7c8d 0%, #4a6b7c 100%)',
+                                color: '#fff',
+                                textDecoration: 'none',
+                                borderRadius: '12px',
+                                fontWeight: '600',
+                                fontSize: '16px',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <span style={{ fontSize: '24px' }}>🤝</span>
+                            Team Effectiveness
+                        </Link>
+                    </div>
                 </div>
             </section>
 

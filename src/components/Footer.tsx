@@ -64,7 +64,7 @@ export default function Footer() {
 
                 <div className="footer-bottom">
                     <p>
-                        &copy; {new Date().getFullYear()} Mindful Consulting. All rights reserved.
+                        Idiahus &copy; {new Date().getFullYear()} Mindful Consulting. All rights reserved.
                     </p>
                 </div>
             </div>
