@@ -144,6 +144,76 @@ export default function SettingsPage() {
                         onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                         onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                     />
+
+                    {/* Warning Box */}
+                    <div style={{
+                        marginTop: '12px',
+                        padding: '12px 16px',
+                        background: '#fef3c7',
+                        border: '1px solid #fbbf24',
+                        borderRadius: '8px'
+                    }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                            <span style={{ fontSize: '18px' }}>⚠️</span>
+                            <div>
+                                <p style={{ fontSize: '13px', fontWeight: '600', color: '#92400e', marginBottom: '4px' }}>
+                                    Important: Do Not Change This Email
+                                </p>
+                                <p style={{ fontSize: '12px', color: '#78350f', lineHeight: '1.5' }}>
+                                    This email is configured in Firebase Cloud Functions for sending contact form messages.
+                                    Changing it requires updating the backend configuration.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Technical Info - Collapsible */}
+                    <details style={{ marginTop: '12px' }}>
+                        <summary style={{
+                            fontSize: '12px',
+                            color: '#3b82f6',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            padding: '8px 0'
+                        }}>
+                            📖 Technical Documentation (Click to expand)
+                        </summary>
+                        <div style={{
+                            marginTop: '8px',
+                            padding: '12px',
+                            background: '#f9fafb',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            color: '#4b5563',
+                            lineHeight: '1.6'
+                        }}>
+                            <p style={{ marginBottom: '8px' }}><strong>Current Setup:</strong></p>
+                            <ul style={{ marginLeft: '20px', marginBottom: '12px' }}>
+                                <li>Email: <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '3px' }}>mindfulconsulting.my@gmail.com</code></li>
+                                <li>Service: Gmail SMTP</li>
+                                <li>Authentication: App Password</li>
+                            </ul>
+
+                            <p style={{ marginBottom: '8px' }}><strong>To Change Email:</strong></p>
+                            <ol style={{ marginLeft: '20px', marginBottom: '12px' }}>
+                                <li>Update <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '3px' }}>functions/.env</code> file:
+                                    <pre style={{ background: '#1f2937', color: '#f3f4f6', padding: '8px', borderRadius: '4px', marginTop: '4px', overflow: 'auto' }}>
+                                        EMAIL_USER=new-email@gmail.com{'\n'}EMAIL_PASSWORD=new-app-password
+                                    </pre>
+                                </li>
+                                <li>Generate new Gmail App Password for the new email</li>
+                                <li>Redeploy Cloud Function: <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '3px' }}>firebase deploy --only functions</code></li>
+                                <li>Update this field in Settings</li>
+                            </ol>
+
+                            <p style={{ marginBottom: '4px' }}><strong>Files to Update:</strong></p>
+                            <ul style={{ marginLeft: '20px' }}>
+                                <li><code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '3px' }}>/functions/.env</code> - Email credentials</li>
+                                <li><code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '3px' }}>/functions/src/index.ts</code> - Recipient email (line 42)</li>
+                            </ul>
+                        </div>
+                    </details>
                 </div>
 
                 {/* Phone Number */}

@@ -74,8 +74,12 @@ export default function ContactPage() {
         setSubmitting(true);
 
         try {
-            // Send email via API
-            const response = await fetch('/api/contact', {
+            // Send email via Firebase Cloud Function
+            const functionUrl = process.env.NODE_ENV === 'production'
+                ? 'https://us-central1-mindfulconsulting-538b9.cloudfunctions.net/sendContactEmail'
+                : '/api/contact';
+
+            const response = await fetch(functionUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
