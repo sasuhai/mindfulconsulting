@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mindfulconsulting-538b9.web.app'),
   title: 'Mindful Consulting | Leadership Development',
   description: 'Developing Mindful Leaders for Complex Organizations',
   keywords: ['leadership development', 'executive coaching', 'team effectiveness', 'mindful leadership', 'organizational development'],
@@ -25,20 +26,20 @@ export const metadata: Metadata = {
     description: 'Developing Mindful Leaders for Complex Organizations',
     images: [
       {
-        url: '/og-image.png', // We'll create this
-        width: 1200,
-        height: 630,
-        alt: 'Mindful Consulting - Leadership Development',
+        url: 'https://mindfulconsulting-538b9.web.app/og-image.png',
+        width: 152,
+        height: 136,
+        alt: 'Mindful Consulting Logo',
       },
     ],
   },
 
   // Twitter Card
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'Mindful Consulting | Leadership Development',
     description: 'Developing Mindful Leaders for Complex Organizations',
-    images: ['/og-image.png'],
+    images: ['https://mindfulconsulting-538b9.web.app/og-image.png'],
     creator: '@mindfulconsulting',
   },
 
