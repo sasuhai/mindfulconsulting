@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://mindfulconsulting-538b9.web.app'),
   title: 'Mindful Consulting | Leadership Development',
-  description: 'Developing Mindful Leaders for Complex Organizations',
+  description: 'Growth with Presence',
   keywords: ['leadership development', 'executive coaching', 'team effectiveness', 'mindful leadership', 'organizational development'],
   authors: [{ name: 'Mindful Consulting' }],
   creator: 'Mindful Consulting',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: 'https://mindfulconsulting-538b9.web.app',
     siteName: 'Mindful Consulting',
     title: 'Mindful Consulting | Leadership Development',
-    description: 'Developing Mindful Leaders for Complex Organizations',
+    description: 'Growth with Presence',
     images: [
       {
         url: 'https://mindfulconsulting-538b9.web.app/og-image.png',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'Mindful Consulting | Leadership Development',
-    description: 'Developing Mindful Leaders for Complex Organizations',
+    description: 'Growth with Presence',
     images: ['https://mindfulconsulting-538b9.web.app/og-image.png'],
     creator: '@mindfulconsulting',
   },
