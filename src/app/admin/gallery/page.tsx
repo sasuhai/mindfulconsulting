@@ -1,167 +1,127 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-interface Photo {
+interface Album {
     id: string;
-    url: string;
+    title: string;
+    description?: string;
     thumbnailUrl: string;
-    caption?: string;
+    icloudUrl: string;
+    photoCount?: number;
     date?: string;
-    album?: string;
-    googlePhotosId?: string;
 }
 
-const GOOGLE_PHOTOS_ALBUM_URL = 'https://photos.app.goo.gl/gA8Saubf83j2Cuno9';
+// Get a varied placeholder image based on album ID
+const getPlaceholderImage = (albumId: string): string => {
+    const placeholders = [
+        'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1452457807411-4979b707c5be?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&h=600&fit=crop',
+    ];
+    const hash = albumId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return placeholders[hash % placeholders.length];
+};
 
 export default function AdminGalleryPage() {
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(false);
-    const [syncing, setSyncing] = useState(false);
-    const [syncStatus, setSyncStatus] = useState<string>('');
-    const [isConnected, setIsConnected] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
 
     useEffect(() => {
-        fetchPhotos();
+        fetchAlbums();
     }, []);
 
-    const fetchPhotos = async () => {
+    const fetchAlbums = async () => {
         setLoading(true);
         try {
-            const querySnapshot = await getDocs(collection(db, 'gallery_photos'));
-            const photosData: Photo[] = [];
+            const querySnapshot = await getDocs(collection(db, 'photo_albums'));
+            const albumsData: Album[] = [];
             querySnapshot.forEach((doc) => {
-                photosData.push({ id: doc.id, ...doc.data() } as Photo);
+                albumsData.push({ id: doc.id, ...doc.data() } as Album);
             });
-            setPhotos(photosData.sort((a, b) => (b.date || '').localeCompare(a.date || '')));
+            setAlbums(albumsData.sort((a, b) => (b.date || '').localeCompare(a.date || '')));
         } catch (error) {
-            console.error('Error fetching photos:', error);
+            console.error('Error fetching albums:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const syncFromGooglePhotos = async () => {
-        setSyncing(true);
-        setSyncStatus('Connecting to Google Photos...');
-
+    const saveAlbum = async (album: Album) => {
         try {
-            // Call our API route to fetch photos from Google Photos
-            setSyncStatus('Fetching photos from Google Photos album...');
-            const response = await fetch('/api/gallery/sync-icloud', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ albumUrl: GOOGLE_PHOTOS_ALBUM_URL })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to sync from Google Photos');
-            }
-
-            const data = await response.json();
-
-            if (data.success) {
-                setSyncStatus(`Successfully synced ${data.count} photos!`);
-                setTimeout(() => {
-                    fetchPhotos();
-                    setSyncStatus('');
-                }, 2000);
-            } else {
-                throw new Error(data.error || 'Sync failed');
-            }
+            await setDoc(doc(db, 'photo_albums', album.id), album);
+            alert('✅ Album saved successfully!');
+            fetchAlbums();
+            setIsEditing(false);
+            setEditingAlbum(null);
         } catch (error) {
-            console.error('Error syncing from Google Photos:', error);
-            setSyncStatus('❌ Sync failed. Please try again or contact support.');
-            setTimeout(() => setSyncStatus(''), 5000);
-        } finally {
-            setSyncing(false);
+            console.error('Error saving album:', error);
+            alert('❌ Failed to save album');
         }
     };
 
-    const deletePhoto = async (photoId: string) => {
-        if (!confirm('Are you sure you want to delete this photo?')) return;
+    const deleteAlbum = async (albumId: string) => {
+        if (!confirm('Are you sure you want to delete this album?')) return;
 
         try {
-            await deleteDoc(doc(db, 'gallery_photos', photoId));
-            alert('✅ Photo deleted successfully!');
-            fetchPhotos();
+            await deleteDoc(doc(db, 'photo_albums', albumId));
+            alert('✅ Album deleted successfully!');
+            fetchAlbums();
         } catch (error) {
-            console.error('Error deleting photo:', error);
-            alert('Failed to delete photo');
+            console.error('Error deleting album:', error);
+            alert('❌ Failed to delete album');
         }
     };
 
-    const updateCaption = async (photoId: string, newCaption: string) => {
-        try {
-            const photo = photos.find(p => p.id === photoId);
-            if (!photo) return;
-
-            await setDoc(doc(db, 'gallery_photos', photoId), {
-                ...photo,
-                caption: newCaption
-            });
-            alert('✅ Caption updated!');
-            fetchPhotos();
-        } catch (error) {
-            console.error('Error updating caption:', error);
-            alert('Failed to update caption');
-        }
+    const startNewAlbum = () => {
+        setEditingAlbum({
+            id: Date.now().toString(),
+            title: '',
+            description: '',
+            thumbnailUrl: '',
+            icloudUrl: '',
+            photoCount: 0,
+            date: new Date().toISOString().split('T')[0]
+        });
+        setIsEditing(true);
     };
 
     return (
         <div className="main-wrapper" style={{ paddingTop: '100px', paddingBottom: '60px', minHeight: '100vh', background: 'var(--color-background)' }}>
-            <div className="container" style={{ maxWidth: '1400px' }}>
+            <div className="container" style={{ maxWidth: '1200px' }}>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
                     <div>
                         <h1 className="heading-1" style={{ fontSize: '32px', marginBottom: '4px' }}>
-                            Photo Gallery
+                            Photo Albums
                         </h1>
                         <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>
-                            Manage photos from Google Photos Shared Album
+                            Manage iCloud shared album links
                         </p>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        {!isConnected && (
-                            <a
-                                href="/api/auth/google"
-                                style={{
-                                    padding: '12px 24px',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    background: '#4285f4',
-                                    color: '#fff',
-                                    textDecoration: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px'
-                                }}
-                            >
-                                🔗 Connect Google Photos
-                            </a>
-                        )}
+                    <div style={{ display: 'flex', gap: '12px' }}>
                         <button
-                            onClick={syncFromGooglePhotos}
-                            disabled={syncing}
+                            onClick={startNewAlbum}
                             style={{
                                 padding: '12px 24px',
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 borderRadius: '8px',
                                 border: 'none',
-                                background: syncing ? '#999' : 'var(--color-accent)',
+                                background: 'var(--color-accent)',
                                 color: '#fff',
-                                cursor: syncing ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
+                                cursor: 'pointer'
                             }}
                         >
-                            {syncing ? '⏳ Syncing...' : '📸 Sync from Google Photos'}
+                            ➕ Add New Album
                         </button>
                         <a
                             href="/gallery"
@@ -185,159 +145,85 @@ export default function AdminGalleryPage() {
                     </div>
                 </div>
 
-                {/* Sync Status */}
-                {syncStatus && (
-                    <div style={{
-                        padding: '16px 24px',
-                        background: syncStatus.includes('❌') ? '#fee' : '#efe',
-                        border: `1px solid ${syncStatus.includes('❌') ? '#fcc' : '#cfc'}`,
-                        borderRadius: '8px',
-                        marginBottom: '24px',
-                        fontSize: '14px',
-                        fontWeight: '500'
-                    }}>
-                        {syncStatus}
-                    </div>
-                )}
-
-                {/* Google Photos Album Info */}
+                {/* Instructions */}
                 <div style={{
                     padding: '20px',
-                    background: 'var(--color-surface)',
+                    background: '#e3f2fd',
+                    border: '1px solid #90caf9',
                     borderRadius: '12px',
-                    border: '1px solid var(--color-border)',
                     marginBottom: '32px'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                        <span style={{ fontSize: '24px' }}>☁️</span>
-                        <div>
-                            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
-                                Connected Google Photos Album
-                            </h3>
-                            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-                                Photos will be synced from your shared album when you click "Sync from Google Photos"
-                            </p>
-                        </div>
-                    </div>
-                    <a
-                        href={GOOGLE_PHOTOS_ALBUM_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            fontSize: '12px',
-                            color: 'var(--color-accent)',
-                            textDecoration: 'none',
-                            fontFamily: 'monospace'
-                        }}
-                    >
-                        {GOOGLE_PHOTOS_ALBUM_URL}
-                    </a>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#1976d2' }}>
+                        💡 How to Use
+                    </h3>
+                    <ol style={{ fontSize: '14px', lineHeight: '1.8', color: '#0d47a1', paddingLeft: '20px', margin: 0 }}>
+                        <li>Create a shared album in iOS Photos app</li>
+                        <li>Get the public iCloud link (Share → Copy Link)</li>
+                        <li>Click "Add New Album" above</li>
+                        <li>Fill in the album details and paste the iCloud link</li>
+                        <li>Add a thumbnail image URL (can be from any photo in the album)</li>
+                        <li>Save - the album will appear on the public gallery page</li>
+                    </ol>
                 </div>
 
-                {/* Stats */}
-                {photos.length > 0 && (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '16px',
-                        marginBottom: '32px'
-                    }}>
-                        <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-                            <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--color-accent)', marginBottom: '4px' }}>
-                                {photos.length}
-                            </div>
-                            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>Total Photos</div>
-                        </div>
-                        <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-                            <div style={{ fontSize: '28px', fontWeight: '700', color: '#10b981', marginBottom: '4px' }}>
-                                {photos.filter(p => p.caption).length}
-                            </div>
-                            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>With Captions</div>
-                        </div>
-                        <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-                            <div style={{ fontSize: '28px', fontWeight: '700', color: '#f59e0b', marginBottom: '4px' }}>
-                                {new Set(photos.map(p => p.album).filter(Boolean)).size}
-                            </div>
-                            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>Albums</div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Photos List */}
+                {/* Albums List */}
                 {loading ? (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '80px 20px',
-                        background: 'var(--color-surface)',
-                        borderRadius: '12px',
-                    }}>
+                    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                         <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
-                        <h3 style={{ fontSize: '18px' }}>Loading photos...</h3>
+                        <h3 style={{ fontSize: '18px' }}>Loading albums...</h3>
                     </div>
-                ) : photos.length === 0 ? (
+                ) : albums.length === 0 ? (
                     <div style={{
                         textAlign: 'center',
                         padding: '80px 20px',
                         background: 'var(--color-surface)',
                         borderRadius: '12px',
-                        border: '2px dashed var(--color-border)',
+                        border: '2px dashed var(--color-border)'
                     }}>
-                        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📸</div>
-                        <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>No photos yet</h3>
+                        <div style={{ fontSize: '64px', marginBottom: '16px' }}>📸</div>
+                        <h3 style={{ fontSize: '20px', marginBottom: '8px' }}>No albums yet</h3>
                         <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
-                            Click "Sync from Google Photos" to import photos from your shared album
+                            Click "Add New Album" to create your first album
                         </p>
                     </div>
                 ) : (
                     <div style={{ display: 'grid', gap: '16px' }}>
-                        {photos.map((photo) => (
-                            <PhotoRow
-                                key={photo.id}
-                                photo={photo}
-                                onDelete={() => deletePhoto(photo.id)}
-                                onUpdateCaption={(caption) => updateCaption(photo.id, caption)}
+                        {albums.map((album) => (
+                            <AlbumRow
+                                key={album.id}
+                                album={album}
+                                onEdit={() => {
+                                    setEditingAlbum(album);
+                                    setIsEditing(true);
+                                }}
+                                onDelete={() => deleteAlbum(album.id)}
                             />
                         ))}
                     </div>
                 )}
 
-                {/* Instructions */}
-                <div style={{
-                    marginTop: '40px',
-                    padding: '24px',
-                    background: '#f0f9ff',
-                    border: '1px solid #bae6fd',
-                    borderRadius: '12px'
-                }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#0369a1' }}>
-                        💡 How to Use
-                    </h3>
-                    <ol style={{ fontSize: '14px', lineHeight: '1.8', color: '#0c4a6e', paddingLeft: '20px' }}>
-                        <li>Add photos to your Google Photos Shared Album (auto-syncs from iOS)</li>
-                        <li>Click the "📸 Sync from Google Photos" button above</li>
-                        <li>Photos will be imported with their captions automatically</li>
-                        <li>Edit captions here if needed</li>
-                        <li>Photos appear on the public gallery page instantly</li>
-                    </ol>
-                </div>
+                {/* Edit Modal */}
+                {isEditing && editingAlbum && (
+                    <EditModal
+                        album={editingAlbum}
+                        onSave={saveAlbum}
+                        onCancel={() => {
+                            setIsEditing(false);
+                            setEditingAlbum(null);
+                        }}
+                        onChange={setEditingAlbum}
+                    />
+                )}
             </div>
         </div>
     );
 }
 
-function PhotoRow({ photo, onDelete, onUpdateCaption }: {
-    photo: Photo;
+function AlbumRow({ album, onEdit, onDelete }: {
+    album: Album;
+    onEdit: () => void;
     onDelete: () => void;
-    onUpdateCaption: (caption: string) => void;
 }) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedCaption, setEditedCaption] = useState(photo.caption || '');
-
-    const handleSave = () => {
-        onUpdateCaption(editedCaption);
-        setIsEditing(false);
-    };
-
     return (
         <div style={{
             padding: '20px',
@@ -351,11 +237,11 @@ function PhotoRow({ photo, onDelete, onUpdateCaption }: {
         }}>
             {/* Thumbnail */}
             <img
-                src={photo.thumbnailUrl}
-                alt={photo.caption || 'Photo'}
+                src={album.thumbnailUrl}
+                alt={album.title}
                 style={{
                     width: '120px',
-                    height: '120px',
+                    height: '80px',
                     objectFit: 'cover',
                     borderRadius: '8px'
                 }}
@@ -363,117 +249,256 @@ function PhotoRow({ photo, onDelete, onUpdateCaption }: {
 
             {/* Details */}
             <div>
-                {isEditing ? (
-                    <div style={{ marginBottom: '12px' }}>
-                        <input
-                            value={editedCaption}
-                            onChange={(e) => setEditedCaption(e.target.value)}
-                            placeholder="Add caption..."
-                            style={{
-                                width: '100%',
-                                padding: '8px 12px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--color-border)',
-                                fontSize: '14px'
-                            }}
-                        />
-                    </div>
-                ) : (
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
-                        {photo.caption || <span style={{ color: '#999', fontStyle: 'italic' }}>No caption</span>}
-                    </h3>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
+                    {album.title}
+                </h3>
+                {album.description && (
+                    <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+                        {album.description}
+                    </p>
                 )}
-
-                <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-                    {photo.album && (
-                        <span style={{
-                            padding: '4px 8px',
-                            background: 'var(--color-accent)20',
-                            color: 'var(--color-accent)',
-                            borderRadius: '4px',
-                            fontWeight: '600'
-                        }}>
-                            {photo.album}
-                        </span>
-                    )}
-                    {photo.date && (
-                        <span>📅 {new Date(photo.date).toLocaleDateString()}</span>
-                    )}
+                <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                    {album.photoCount && <span>📸 {album.photoCount} photos</span>}
+                    {album.date && <span>📅 {new Date(album.date).toLocaleDateString()}</span>}
+                    <a
+                        href={album.icloudUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--color-accent)', textDecoration: 'none' }}
+                    >
+                        🔗 View iCloud Album
+                    </a>
                 </div>
             </div>
 
             {/* Actions */}
             <div style={{ display: 'flex', gap: '8px' }}>
-                {isEditing ? (
-                    <>
-                        <button
-                            onClick={handleSave}
+                <button
+                    onClick={onEdit}
+                    style={{
+                        padding: '8px 16px',
+                        background: 'var(--color-accent)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Edit
+                </button>
+                <button
+                    onClick={onDelete}
+                    style={{
+                        padding: '8px 16px',
+                        background: '#ef4444',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function EditModal({ album, onSave, onCancel, onChange }: {
+    album: Album;
+    onSave: (album: Album) => void;
+    onCancel: () => void;
+    onChange: (album: Album) => void;
+}) {
+    return (
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+        }}>
+            <div style={{
+                background: '#fff',
+                borderRadius: '16px',
+                padding: '32px',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflow: 'auto'
+            }}>
+                <h2 style={{ fontSize: '24px', marginBottom: '24px' }}>
+                    {album.title ? 'Edit Album' : 'New Album'}
+                </h2>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                            Album Title *
+                        </label>
+                        <input
+                            type="text"
+                            value={album.title}
+                            onChange={(e) => onChange({ ...album, title: e.target.value })}
+                            placeholder="e.g., Leadership Workshop 2024"
                             style={{
-                                padding: '8px 16px',
-                                background: 'var(--color-accent)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: '1px solid #ddd',
+                                fontSize: '14px'
                             }}
-                        >
-                            Save
-                        </button>
-                        <button
-                            onClick={() => {
-                                setIsEditing(false);
-                                setEditedCaption(photo.caption || '');
-                            }}
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                            Description
+                        </label>
+                        <textarea
+                            value={album.description}
+                            onChange={(e) => onChange({ ...album, description: e.target.value })}
+                            placeholder="Brief description of the album"
+                            rows={3}
                             style={{
-                                padding: '8px 16px',
-                                background: '#fff',
-                                color: '#666',
-                                border: '1px solid var(--color-border)',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: '1px solid #ddd',
+                                fontSize: '14px',
+                                fontFamily: 'inherit'
                             }}
-                        >
-                            Cancel
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <button
-                            onClick={() => setIsEditing(true)}
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                            iCloud Shared Album URL *
+                        </label>
+                        <input
+                            type="url"
+                            value={album.icloudUrl}
+                            onChange={(e) => onChange({ ...album, icloudUrl: e.target.value })}
+                            placeholder="https://www.icloud.com/sharedalbum/..."
                             style={{
-                                padding: '8px 16px',
-                                background: 'var(--color-accent)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: '1px solid #ddd',
+                                fontSize: '14px'
                             }}
-                        >
-                            Edit Caption
-                        </button>
-                        <button
-                            onClick={onDelete}
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                            Thumbnail Image URL (Optional)
+                        </label>
+                        <input
+                            type="url"
+                            value={album.thumbnailUrl}
+                            onChange={(e) => onChange({ ...album, thumbnailUrl: e.target.value })}
+                            placeholder="Leave empty for default placeholder"
                             style={{
-                                padding: '8px 16px',
-                                background: '#ef4444',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: '1px solid #ddd',
+                                fontSize: '14px',
+                                marginBottom: '8px'
                             }}
-                        >
-                            Delete
-                        </button>
-                    </>
-                )}
+                        />
+                        <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>
+                            💡 Tip: Right-click a photo in your iCloud album → "Copy Image Address" and paste here
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                                Photo Count
+                            </label>
+                            <input
+                                type="number"
+                                value={album.photoCount || ''}
+                                onChange={(e) => onChange({ ...album, photoCount: parseInt(e.target.value) || 0 })}
+                                placeholder="0"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ddd',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+                                Date
+                            </label>
+                            <input
+                                type="date"
+                                value={album.date}
+                                onChange={(e) => onChange({ ...album, date: e.target.value })}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ddd',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                    <button
+                        onClick={() => onSave({
+                            ...album,
+                            thumbnailUrl: album.thumbnailUrl || getPlaceholderImage(album.id)
+                        })}
+                        disabled={!album.title || !album.icloudUrl}
+                        style={{
+                            flex: 1,
+                            padding: '14px',
+                            background: 'var(--color-accent)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '15px',
+                            fontWeight: '600',
+                            cursor: album.title && album.icloudUrl ? 'pointer' : 'not-allowed',
+                            opacity: album.title && album.icloudUrl ? 1 : 0.5
+                        }}
+                    >
+                        Save Album
+                    </button>
+                    <button
+                        onClick={onCancel}
+                        style={{
+                            flex: 1,
+                            padding: '14px',
+                            background: '#f5f5f5',
+                            color: '#666',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '15px',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -28,6 +28,44 @@ function ProgramsContent() {
     useEffect(() => {
         if (trainingId) {
             fetchTraining(trainingId);
+        } else {
+            // Hero animations for main programs page
+            const heroImage = document.getElementById('programsHeroImage');
+            const heroOverlay = document.getElementById('programsHeroOverlay');
+            const heroStatus = document.getElementById('programsHeroStatus');
+            const heroTitle = document.getElementById('programsHeroTitle');
+            const heroSubtitle = document.getElementById('programsHeroSubtitle');
+
+            setTimeout(() => {
+                if (heroImage) {
+                    heroImage.style.opacity = '1';
+                    heroImage.style.transform = 'scale(1)';
+                    heroImage.style.filter = 'brightness(0.85)';
+                }
+            }, 100);
+
+            setTimeout(() => { if (heroOverlay) heroOverlay.style.opacity = '1'; }, 300);
+            setTimeout(() => {
+                if (heroStatus) {
+                    heroStatus.style.opacity = '1';
+                    heroStatus.style.transform = 'translateY(0)';
+                    heroStatus.style.filter = 'blur(0px)';
+                }
+            }, 800);
+            setTimeout(() => {
+                if (heroTitle) {
+                    heroTitle.style.opacity = '1';
+                    heroTitle.style.transform = 'translateY(0)';
+                    heroTitle.style.filter = 'blur(0px)';
+                }
+            }, 1000);
+            setTimeout(() => {
+                if (heroSubtitle) {
+                    heroSubtitle.style.opacity = '1';
+                    heroSubtitle.style.transform = 'translateY(0)';
+                    heroSubtitle.style.filter = 'blur(0px)';
+                }
+            }, 1200);
         }
     }, [trainingId]);
 
@@ -246,17 +284,117 @@ function ProgramsContent() {
         );
     }
 
-    // Show programs list
+    // Show programs list with animated hero
     return (
         <div className="main-wrapper">
+            {/* Hero Section with Photo Background */}
+            <section style={{
+                position: 'relative',
+                minHeight: '70vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                color: '#fff'
+            }}>
+                {/* Background Image */}
+                <img
+                    id="programsHeroImage"
+                    src="/programs-hero.jpg"
+                    alt="Training Programs"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        zIndex: 0,
+                        opacity: 0,
+                        transform: 'scale(1.1)',
+                        filter: 'brightness(0.85)',
+                        transition: 'all 2s ease-out'
+                    }}
+                />
+
+                {/* Gradient Overlay */}
+                <div
+                    id="programsHeroOverlay"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to bottom, rgba(9,9,11,0.4), rgba(9,9,11,0.3), rgba(9,9,11,0.5))',
+                        zIndex: 10,
+                        opacity: 0,
+                        transition: 'opacity 1.5s ease-out'
+                    }}
+                />
+
+                {/* Content */}
+                <div style={{ position: 'relative', zIndex: 20, width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+                    <div
+                        id="programsHeroStatus"
+                        style={{
+                            display: 'inline-block',
+                            padding: '8px 24px',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            borderRadius: '999px',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            letterSpacing: '2px',
+                            textTransform: 'uppercase',
+                            marginBottom: '24px',
+                            opacity: 0,
+                            transform: 'translateY(30px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.2s ease-out'
+                        }}
+                    >
+                        Transformative Learning
+                    </div>
+
+                    <h1
+                        id="programsHeroTitle"
+                        style={{
+                            fontSize: 'clamp(36px, 5vw, 56px)',
+                            fontWeight: '600',
+                            lineHeight: '1.2',
+                            marginBottom: '24px',
+                            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+                            color: '#fff',
+                            opacity: 0,
+                            transform: 'translateY(40px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
+                        Our Training Programs
+                    </h1>
+
+                    <p
+                        id="programsHeroSubtitle"
+                        style={{
+                            fontSize: '18px',
+                            lineHeight: '1.6',
+                            maxWidth: '700px',
+                            margin: '0 auto',
+                            color: '#d4d4d8',
+                            opacity: 0,
+                            transform: 'translateY(50px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
+                        Transformative learning experiences designed for the modern leader
+                    </p>
+                </div>
+            </section>
+
+            {/* Program Navigation Buttons */}
             <section className="section bg-surface text-center">
                 <div className="container">
-                    <h1 className="heading-1 mb-4">Our Training Programs</h1>
-                    <p className="body-large" style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '48px' }}>
-                        Transformative learning experiences designed for the modern leader.
-                    </p>
-
-                    {/* Program Navigation Buttons */}
                     <div style={{
                         display: 'flex',
                         gap: '16px',

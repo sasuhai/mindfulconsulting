@@ -1,233 +1,234 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
-interface Photo {
+interface Album {
     id: string;
-    url: string;
+    title: string;
+    description?: string;
     thumbnailUrl: string;
-    caption?: string;
+    icloudUrl: string;
+    photoCount?: number;
     date?: string;
-    album?: string;
 }
 
+// Get a varied placeholder image based on album ID
+const getPlaceholderImage = (albumId: string): string => {
+    const placeholders = [
+        'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800&h=600&fit=crop', // Photo wall
+        'https://images.unsplash.com/photo-1452457807411-4979b707c5be?w=800&h=600&fit=crop', // Landscape
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // Mountain
+        'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=800&h=600&fit=crop', // People
+        'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=600&fit=crop', // Camera
+        'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&h=600&fit=crop', // Photography
+    ];
+
+    // Simple hash function to get consistent index for each album
+    const hash = albumId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return placeholders[hash % placeholders.length];
+};
+
 export default function GalleryPage() {
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-    const [filterAlbum, setFilterAlbum] = useState<string>('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('masonry');
 
     const accentColor = '#7a8a6f';
 
     useEffect(() => {
-        fetchPhotos();
+        // Hero animations
+        const heroImage = document.getElementById('galleryHeroImage');
+        const heroOverlay = document.getElementById('galleryHeroOverlay');
+        const heroStatus = document.getElementById('galleryHeroStatus');
+        const heroTitle = document.getElementById('galleryHeroTitle');
+        const heroSubtitle = document.getElementById('galleryHeroSubtitle');
+
+        setTimeout(() => {
+            if (heroImage) {
+                heroImage.style.opacity = '1';
+                heroImage.style.transform = 'scale(1)';
+                heroImage.style.filter = 'brightness(0.85)';
+            }
+        }, 100);
+
+        setTimeout(() => { if (heroOverlay) heroOverlay.style.opacity = '1'; }, 300);
+        setTimeout(() => {
+            if (heroStatus) {
+                heroStatus.style.opacity = '1';
+                heroStatus.style.transform = 'translateY(0)';
+                heroStatus.style.filter = 'blur(0px)';
+            }
+        }, 800);
+        setTimeout(() => {
+            if (heroTitle) {
+                heroTitle.style.opacity = '1';
+                heroTitle.style.transform = 'translateY(0)';
+                heroTitle.style.filter = 'blur(0px)';
+            }
+        }, 1000);
+        setTimeout(() => {
+            if (heroSubtitle) {
+                heroSubtitle.style.opacity = '1';
+                heroSubtitle.style.transform = 'translateY(0)';
+                heroSubtitle.style.filter = 'blur(0px)';
+            }
+        }, 1200);
+
+        fetchAlbums();
     }, []);
 
-    const fetchPhotos = async () => {
+    const fetchAlbums = async () => {
         setLoading(true);
         try {
-            const querySnapshot = await getDocs(collection(db, 'gallery_photos'));
-            const photosData: Photo[] = [];
+            const querySnapshot = await getDocs(collection(db, 'photo_albums'));
+            const albumsData: Album[] = [];
             querySnapshot.forEach((doc) => {
-                photosData.push({ id: doc.id, ...doc.data() } as Photo);
+                albumsData.push({ id: doc.id, ...doc.data() } as Album);
             });
-            setPhotos(photosData.sort((a, b) => (b.date || '').localeCompare(a.date || '')));
+            setAlbums(albumsData.sort((a, b) => (b.date || '').localeCompare(a.date || '')));
         } catch (error) {
-            console.error('Error fetching photos:', error);
+            console.error('Error fetching albums:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Get unique albums
-    const albums = ['all', ...Array.from(new Set(photos.map(p => p.album).filter(Boolean)))];
-
-    // Filter photos
-    const filteredPhotos = photos.filter(photo => {
-        const albumMatch = filterAlbum === 'all' || photo.album === filterAlbum;
-        const searchMatch = !searchQuery ||
-            photo.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            photo.album?.toLowerCase().includes(searchQuery.toLowerCase());
-        return albumMatch && searchMatch;
-    });
-
     return (
         <div className="main-wrapper">
-            {/* Hero Section */}
+            {/* Hero Section with Photo Background */}
             <section style={{
                 position: 'relative',
-                padding: '120px 24px 80px',
-                background: `linear-gradient(135deg, ${accentColor} 0%, #5a6a4f 100%)`,
-                color: '#fff',
-                overflow: 'hidden'
+                minHeight: '70vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                color: '#fff'
             }}>
-                <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.1,
-                    backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-                    backgroundSize: '48px 48px'
-                }} />
+                {/* Background Image with zoom animation */}
+                <img
+                    id="galleryHeroImage"
+                    src="/gallery-hero.jpg"
+                    alt="Photo Gallery"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        zIndex: 0,
+                        opacity: 0,
+                        transform: 'scale(1.1)',
+                        filter: 'brightness(0.85)',
+                        transition: 'all 2s ease-out'
+                    }}
+                />
 
-                <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 10, textAlign: 'center' }}>
-                    <div style={{
-                        display: 'inline-block',
-                        padding: '8px 24px',
-                        background: 'rgba(255,255,255,0.2)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        borderRadius: '999px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        letterSpacing: '2px',
-                        textTransform: 'uppercase',
-                        marginBottom: '24px'
-                    }}>
+                {/* Gradient Overlay */}
+                <div
+                    id="galleryHeroOverlay"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to bottom, rgba(9,9,11,0.4), rgba(9,9,11,0.3), rgba(9,9,11,0.5))',
+                        zIndex: 10,
+                        opacity: 0,
+                        transition: 'opacity 1.5s ease-out'
+                    }}
+                />
+
+                {/* Content */}
+                <div style={{ position: 'relative', zIndex: 20, width: '100%', maxWidth: '1000px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+                    {/* Status Badge */}
+                    <div
+                        id="galleryHeroStatus"
+                        style={{
+                            display: 'inline-block',
+                            padding: '8px 24px',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            borderRadius: '999px',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            letterSpacing: '2px',
+                            textTransform: 'uppercase',
+                            marginBottom: '24px',
+                            opacity: 0,
+                            transform: 'translateY(30px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.2s ease-out'
+                        }}
+                    >
                         Our Journey
                     </div>
 
-                    <h1 style={{
-                        fontSize: 'clamp(36px, 5vw, 56px)',
-                        fontWeight: '300',
-                        lineHeight: '1.2',
-                        marginBottom: '24px',
-                        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
-                    }}>
-                        Photo Gallery
+                    {/* Title */}
+                    <h1
+                        id="galleryHeroTitle"
+                        style={{
+                            fontSize: 'clamp(36px, 5vw, 56px)',
+                            fontWeight: '600',
+                            lineHeight: '1.2',
+                            marginBottom: '24px',
+                            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+                            color: '#fff',
+                            opacity: 0,
+                            transform: 'translateY(40px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
+                        Photo Albums
                     </h1>
 
-                    <p style={{
-                        fontSize: '18px',
-                        lineHeight: '1.6',
-                        opacity: 0.95,
-                        maxWidth: '700px',
-                        margin: '0 auto'
-                    }}>
-                        Moments from our workshops, training sessions, and leadership development programs
+                    {/* Subtitle */}
+                    <p
+                        id="galleryHeroSubtitle"
+                        style={{
+                            fontSize: '18px',
+                            lineHeight: '1.6',
+                            maxWidth: '700px',
+                            margin: '0 auto',
+                            color: '#d4d4d8',
+                            opacity: 0,
+                            transform: 'translateY(50px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
+                        Browse our collection of memories from workshops, training sessions, and events
                     </p>
                 </div>
             </section>
 
-            {/* Filters & Controls */}
-            <section style={{ padding: '40px 24px', background: '#fafafa', borderBottom: '1px solid #e5e5e5' }}>
-                <div className="container" style={{ maxWidth: '1400px', margin: '0 auto' }}>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {/* Left side - Filters */}
-                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-                            {/* Search */}
-                            <input
-                                type="text"
-                                placeholder="Search photos..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{
-                                    padding: '10px 16px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #ddd',
-                                    background: '#fff',
-                                    fontSize: '14px',
-                                    minWidth: '200px'
-                                }}
-                            />
-
-                            {/* Album Filter */}
-                            <select
-                                value={filterAlbum}
-                                onChange={(e) => setFilterAlbum(e.target.value)}
-                                style={{
-                                    padding: '10px 16px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #ddd',
-                                    background: '#fff',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {albums.map(album => (
-                                    <option key={album} value={album}>
-                                        {album === 'all' ? 'All Albums' : album}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <div style={{ fontSize: '14px', color: '#666' }}>
-                                {filteredPhotos.length} photo{filteredPhotos.length !== 1 ? 's' : ''}
-                            </div>
-                        </div>
-
-                        {/* Right side - View Mode */}
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                style={{
-                                    padding: '10px 20px',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    background: viewMode === 'grid' ? accentColor : '#fff',
-                                    color: viewMode === 'grid' ? '#fff' : '#666',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
-                                }}
-                            >
-                                Grid
-                            </button>
-                            <button
-                                onClick={() => setViewMode('masonry')}
-                                style={{
-                                    padding: '10px 20px',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    background: viewMode === 'masonry' ? accentColor : '#fff',
-                                    color: viewMode === 'masonry' ? '#fff' : '#666',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
-                                }}
-                            >
-                                Masonry
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Photo Grid */}
+            {/* Albums Grid */}
             <section style={{ padding: '80px 24px', background: '#fff' }}>
-                <div className="container" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+                <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '64px', marginBottom: '16px' }}>⏳</div>
-                            <h3 style={{ fontSize: '20px', color: '#666' }}>Loading photos...</h3>
+                            <h3 style={{ fontSize: '20px', color: '#666' }}>Loading albums...</h3>
                         </div>
-                    ) : filteredPhotos.length === 0 ? (
+                    ) : albums.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '64px', marginBottom: '16px' }}>📸</div>
-                            <h3 style={{ fontSize: '20px', marginBottom: '8px', color: '#666' }}>No photos found</h3>
-                            <p style={{ color: '#999' }}>Try adjusting your filters</p>
+                            <h3 style={{ fontSize: '20px', marginBottom: '8px', color: '#666' }}>No albums yet</h3>
+                            <p style={{ color: '#999' }}>Check back soon for new photo albums</p>
                         </div>
                     ) : (
                         <div style={{
-                            display: viewMode === 'grid' ? 'grid' : 'columns',
-                            gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(300px, 1fr))' : undefined,
-                            columns: viewMode === 'masonry' ? '3 300px' : undefined,
-                            gap: '24px',
-                            columnGap: viewMode === 'masonry' ? '24px' : undefined
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                            gap: '32px'
                         }}>
-                            {filteredPhotos.map((photo, idx) => (
-                                <PhotoCard
-                                    key={photo.id}
-                                    photo={photo}
+                            {albums.map((album, idx) => (
+                                <AlbumCard
+                                    key={album.id}
+                                    album={album}
                                     index={idx}
-                                    onClick={() => setSelectedPhoto(photo)}
                                     accentColor={accentColor}
                                 />
                             ))}
@@ -236,86 +237,57 @@ export default function GalleryPage() {
                 </div>
             </section>
 
-            {/* Lightbox */}
-            {selectedPhoto && (
-                <Lightbox
-                    photo={selectedPhoto}
-                    onClose={() => setSelectedPhoto(null)}
-                    onNext={() => {
-                        const currentIndex = filteredPhotos.findIndex(p => p.id === selectedPhoto.id);
-                        const nextIndex = (currentIndex + 1) % filteredPhotos.length;
-                        setSelectedPhoto(filteredPhotos[nextIndex]);
-                    }}
-                    onPrev={() => {
-                        const currentIndex = filteredPhotos.findIndex(p => p.id === selectedPhoto.id);
-                        const prevIndex = currentIndex === 0 ? filteredPhotos.length - 1 : currentIndex - 1;
-                        setSelectedPhoto(filteredPhotos[prevIndex]);
-                    }}
-                />
-            )}
-
-            {/* Note about iCloud Integration */}
+            {/* Info Section */}
             <section style={{ padding: '60px 24px', background: '#fafafa', textAlign: 'center' }}>
                 <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <div style={{ fontSize: '32px', marginBottom: '16px' }}>☁️</div>
                     <h3 style={{ fontSize: '20px', marginBottom: '12px', color: '#666' }}>
-                        Connected to iCloud Shared Album
+                        Hosted on iCloud
                     </h3>
-                    <p style={{ fontSize: '14px', color: '#999', marginBottom: '20px' }}>
-                        Photos are synced from your iOS shared album. Updates may take a few minutes to appear.
+                    <p style={{ fontSize: '14px', color: '#999', lineHeight: '1.6' }}>
+                        Our photo albums are hosted on iCloud Shared Albums. Click any album to view photos in full resolution.
                     </p>
-                    <button
-                        onClick={fetchPhotos}
-                        disabled={loading}
-                        style={{
-                            padding: '12px 24px',
-                            background: accentColor,
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            opacity: loading ? 0.6 : 1
-                        }}
-                    >
-                        {loading ? 'Refreshing...' : '🔄 Refresh Photos'}
-                    </button>
                 </div>
             </section>
         </div>
     );
 }
 
-function PhotoCard({ photo, index, onClick, accentColor }: {
-    photo: Photo;
+function AlbumCard({ album, index, accentColor }: {
+    album: Album;
     index: number;
-    onClick: () => void;
     accentColor: string;
 }) {
     const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
     return (
-        <div
-            onClick={onClick}
+        <a
+            href={album.icloudUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{
-                position: 'relative',
-                borderRadius: '12px',
+                display: 'block',
+                textDecoration: 'none',
+                color: 'inherit',
+                borderRadius: '16px',
                 overflow: 'hidden',
-                cursor: 'pointer',
-                breakInside: 'avoid',
-                marginBottom: '24px',
+                background: '#fff',
+                boxShadow: isHovered ? '0 12px 40px rgba(0,0,0,0.15)' : '0 4px 12px rgba(0,0,0,0.08)',
                 transition: 'all 0.3s ease',
-                transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-                boxShadow: isHovered ? '0 12px 30px rgba(0,0,0,0.2)' : '0 4px 12px rgba(0,0,0,0.1)',
-                animation: `fadeInUp 0.6s ease-out ${index * 0.05}s both`
+                transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
+                animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
             }}
         >
-            {/* Image */}
-            <div style={{ position: 'relative', background: '#f0f0f0' }}>
+            {/* Thumbnail */}
+            <div style={{
+                position: 'relative',
+                paddingTop: '66.67%', // 3:2 aspect ratio
+                background: '#f0f0f0',
+                overflow: 'hidden'
+            }}>
                 {!imageLoaded && (
                     <div style={{
                         position: 'absolute',
@@ -325,67 +297,136 @@ function PhotoCard({ photo, index, onClick, accentColor }: {
                         justifyContent: 'center',
                         background: '#f0f0f0'
                     }}>
-                        <div style={{ fontSize: '24px' }}>⏳</div>
+                        <div style={{ fontSize: '32px' }}>📸</div>
                     </div>
                 )}
                 <img
-                    src={photo.thumbnailUrl}
-                    alt={photo.caption || 'Photo'}
+                    src={album.thumbnailUrl || getPlaceholderImage(album.id)}
+                    alt={album.title}
                     onLoad={() => setImageLoaded(true)}
                     style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
                         width: '100%',
-                        height: 'auto',
-                        display: 'block',
+                        height: '100%',
+                        objectFit: 'cover',
                         transition: 'transform 0.3s ease',
                         transform: isHovered ? 'scale(1.05)' : 'scale(1)'
                     }}
                 />
 
-                {/* Overlay on hover */}
+                {/* Overlay */}
                 <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)',
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)',
+                    opacity: isHovered ? 1 : 0.7,
+                    transition: 'opacity 0.3s ease'
+                }} />
+
+                {/* Photo Count Badge */}
+                {album.photoCount && (
+                    <div style={{
+                        position: 'absolute',
+                        top: '16px',
+                        right: '16px',
+                        background: 'rgba(255,255,255,0.95)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '8px 16px',
+                        borderRadius: '999px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: '#333',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        <span>📸</span>
+                        <span>{album.photoCount}</span>
+                    </div>
+                )}
+
+                {/* External Link Icon */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    right: '16px',
+                    width: '40px',
+                    height: '40px',
+                    background: 'rgba(255,255,255,0.95)',
+                    borderRadius: '50%',
                     display: 'flex',
-                    alignItems: 'flex-end',
-                    padding: '20px'
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px',
+                    opacity: isHovered ? 1 : 0,
+                    transform: isHovered ? 'scale(1)' : 'scale(0.8)',
+                    transition: 'all 0.3s ease'
                 }}>
-                    <div style={{ color: '#fff', fontSize: '24px' }}>🔍</div>
+                    🔗
                 </div>
             </div>
 
-            {/* Caption */}
-            {photo.caption && (
-                <div style={{
-                    padding: '16px',
-                    background: '#fff'
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+                <h3 style={{
+                    fontSize: '20px',
+                    fontWeight: '600',
+                    marginBottom: '8px',
+                    color: '#1a1a1a'
                 }}>
-                    <h3 style={{
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        marginBottom: '4px',
-                        color: '#1a1a1a'
+                    {album.title}
+                </h3>
+
+                {album.description && (
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#666',
+                        lineHeight: '1.6',
+                        marginBottom: '12px'
                     }}>
-                        {photo.caption}
-                    </h3>
-                    {photo.album && (
-                        <div style={{
-                            display: 'inline-block',
-                            padding: '4px 8px',
-                            background: `${accentColor}20`,
-                            color: accentColor,
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            marginTop: '8px'
-                        }}>
-                            {photo.album}
-                        </div>
-                    )}
+                        {album.description}
+                    </p>
+                )}
+
+                {album.date && (
+                    <div style={{
+                        fontSize: '13px',
+                        color: '#999',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        <span>📅</span>
+                        <span>{new Date(album.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}</span>
+                    </div>
+                )}
+
+                {/* View Album Button */}
+                <div style={{
+                    marginTop: '16px',
+                    padding: '12px 20px',
+                    background: isHovered ? accentColor : '#f5f5f5',
+                    color: isHovered ? '#fff' : accentColor,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    textAlign: 'center',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                }}>
+                    <span>View Album</span>
+                    <span style={{ fontSize: '16px' }}>→</span>
                 </div>
-            )}
+            </div>
 
             <style jsx>{`
                 @keyframes fadeInUp {
@@ -399,157 +440,6 @@ function PhotoCard({ photo, index, onClick, accentColor }: {
                     }
                 }
             `}</style>
-        </div>
-    );
-}
-
-function Lightbox({ photo, onClose, onNext, onPrev }: {
-    photo: Photo;
-    onClose: () => void;
-    onNext: () => void;
-    onPrev: () => void;
-}) {
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
-            if (e.key === 'ArrowRight') onNext();
-            if (e.key === 'ArrowLeft') onPrev();
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClose, onNext, onPrev]);
-
-    return (
-        <div
-            onClick={onClose}
-            style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.95)',
-                zIndex: 9999,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '20px',
-                backdropFilter: 'blur(10px)'
-            }}
-        >
-            {/* Close Button */}
-            <button
-                onClick={onClose}
-                style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    background: 'rgba(255,255,255,0.2)',
-                    border: 'none',
-                    color: '#fff',
-                    fontSize: '32px',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-            >
-                ✕
-            </button>
-
-            {/* Previous Button */}
-            <button
-                onClick={(e) => { e.stopPropagation(); onPrev(); }}
-                style={{
-                    position: 'absolute',
-                    left: '20px',
-                    background: 'rgba(255,255,255,0.2)',
-                    border: 'none',
-                    color: '#fff',
-                    fontSize: '32px',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                ←
-            </button>
-
-            {/* Next Button */}
-            <button
-                onClick={(e) => { e.stopPropagation(); onNext(); }}
-                style={{
-                    position: 'absolute',
-                    right: '20px',
-                    background: 'rgba(255,255,255,0.2)',
-                    border: 'none',
-                    color: '#fff',
-                    fontSize: '32px',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                →
-            </button>
-
-            {/* Image Container */}
-            <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                    maxWidth: '90vw',
-                    maxHeight: '90vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '20px'
-                }}
-            >
-                <img
-                    src={photo.url}
-                    alt={photo.caption || 'Photo'}
-                    style={{
-                        maxWidth: '100%',
-                        maxHeight: '80vh',
-                        objectFit: 'contain',
-                        borderRadius: '8px',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-                    }}
-                />
-
-                {/* Caption */}
-                {photo.caption && (
-                    <div style={{
-                        background: 'rgba(255,255,255,0.1)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '16px 24px',
-                        borderRadius: '12px',
-                        color: '#fff',
-                        textAlign: 'center',
-                        maxWidth: '600px'
-                    }}>
-                        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
-                            {photo.caption}
-                        </h3>
-                        {photo.album && (
-                            <p style={{ fontSize: '14px', opacity: 0.8 }}>
-                                {photo.album}
-                            </p>
-                        )}
-                    </div>
-                )}
-            </div>
-        </div>
+        </a>
     );
 }

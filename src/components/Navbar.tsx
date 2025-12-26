@@ -74,6 +74,12 @@ export default function Navbar() {
                             Calendar
                         </Link>
                         <Link
+                            href="/gallery"
+                            className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}
+                        >
+                            Gallery
+                        </Link>
+                        <Link
                             href="/insights"
                             className={`nav-link ${isActive('/insights') ? 'active' : ''}`}
                         >
@@ -144,6 +150,13 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                 >
                     Calendar
+                </Link>
+                <Link
+                    href="/gallery"
+                    className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    Gallery
                 </Link>
                 <Link
                     href="/insights"

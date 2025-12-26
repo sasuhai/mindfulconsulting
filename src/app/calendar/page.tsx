@@ -118,7 +118,7 @@ export default function CalendarPage() {
             if (heroImage) {
                 heroImage.style.opacity = '1';
                 heroImage.style.transform = 'scale(1)';
-                heroImage.style.filter = 'brightness(0.6) blur(0px)';
+                heroImage.style.filter = 'brightness(0.85) ';
             }
         }, 100);
 
@@ -230,7 +230,7 @@ export default function CalendarPage() {
                         zIndex: 0,
                         opacity: 0,
                         transform: 'scale(1.1)',
-                        filter: 'brightness(0.6) blur(10px)',
+                        filter: 'brightness(0.85) blur(10px)',
                         transition: 'all 2s ease-out'
                     }}
                 />
@@ -241,7 +241,7 @@ export default function CalendarPage() {
                     style={{
                         position: 'absolute',
                         inset: 0,
-                        background: 'linear-gradient(to bottom, rgba(9,9,11,0.7), rgba(9,9,11,0.5), rgba(9,9,11,0.8))',
+                        background: 'linear-gradient(to bottom, rgba(9,9,11,0.4), rgba(9,9,11,0.3), rgba(9,9,11,0.5))',
                         zIndex: 10,
                         opacity: 0,
                         transition: 'opacity 1.5s ease-out'
