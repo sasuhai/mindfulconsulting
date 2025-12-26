@@ -485,22 +485,56 @@ export default function CalendarPage() {
 
             {/* CTA Section */}
             <section style={{
+                position: 'relative',
                 padding: '100px 24px',
-                background: `linear-gradient(135deg, ${accentColor} 0%, #5a6a4f 100%)`,
                 color: '#fff',
-                textAlign: 'center'
+                textAlign: 'center',
+                overflow: 'hidden'
             }}>
-                <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                {/* Background Video with smooth loop */}
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: 0,
+                        opacity: 1,
+                        transition: 'opacity 0.5s ease-in-out'
+                    }}
+                >
+                    <source src="/Phone_Cable.mp4" type="video/mp4" />
+                </video>
+
+                {/* Overlay for better text readability */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0, 0, 0, 0.6)',
+                    zIndex: 1
+                }} />
+
+                <div className="container" style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
                     <div style={{ fontSize: '48px', marginBottom: '24px' }}>📞</div>
                     <h2 style={{
                         fontSize: 'clamp(28px, 4vw, 40px)',
                         fontWeight: '300',
                         marginBottom: '16px',
-                        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+                        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+                        color: '#fff'
                     }}>
                         Don't See a Suitable Time?
                     </h2>
-                    <p style={{ fontSize: '18px', lineHeight: '1.6', opacity: 0.95, marginBottom: '32px' }}>
+                    <p style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '32px', color: '#fff' }}>
                         We offer flexible scheduling for private sessions and custom programs.
                         Contact us to discuss your specific needs.
                     </p>
