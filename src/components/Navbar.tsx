@@ -93,11 +93,6 @@ export default function Navbar() {
                         </Link>
                     </div>
 
-                    <div className="navbar-cta-desktop">
-                        <Link href="/register" className="btn btn-primary">
-                            Get Started
-                        </Link>
-                    </div>
 
                     {/* Theme Toggle - Desktop Only */}
                     <div className="theme-toggle-desktop">

@@ -25,6 +25,38 @@ export default function ContactPage() {
         fetchSettings();
     }, []);
 
+    // Hero animations
+    useEffect(() => {
+        const heroImage = document.getElementById('contactHeroImage');
+        const heroOverlay = document.getElementById('contactHeroOverlay');
+        const heroTitle = document.getElementById('contactHeroTitle');
+        const heroSubtitle = document.getElementById('contactHeroSubtitle');
+
+        setTimeout(() => {
+            if (heroImage) {
+                heroImage.style.opacity = '1';
+                heroImage.style.transform = 'scale(1)';
+                heroImage.style.filter = 'brightness(1.1) blur(0px)';
+            }
+        }, 100);
+
+        setTimeout(() => { if (heroOverlay) heroOverlay.style.opacity = '1'; }, 300);
+        setTimeout(() => {
+            if (heroTitle) {
+                heroTitle.style.opacity = '1';
+                heroTitle.style.transform = 'translateY(0)';
+                heroTitle.style.filter = 'blur(0px)';
+            }
+        }, 800);
+        setTimeout(() => {
+            if (heroSubtitle) {
+                heroSubtitle.style.opacity = '1';
+                heroSubtitle.style.transform = 'translateY(0)';
+                heroSubtitle.style.filter = 'blur(0px)';
+            }
+        }, 1000);
+    }, []);
+
     const fetchSettings = async () => {
         try {
             const docRef = doc(db, 'settings', 'general');
@@ -201,10 +233,84 @@ export default function ContactPage() {
                 </div>
             )}
 
-            <section className="section text-center bg-surface">
-                <div className="container">
-                    <h1 className="heading-1 mb-4">Get in Touch</h1>
-                    <p className="body-large" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            {/* Hero Section with Photo Background */}
+            <section style={{
+                position: 'relative',
+                minHeight: '60vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                color: '#fff',
+                marginTop: '80px'
+            }}>
+                {/* Background Image */}
+                <img
+                    id="contactHeroImage"
+                    src="/contact-hero.jpg"
+                    alt="Contact Us"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        zIndex: 0,
+                        opacity: 0,
+                        transform: 'scale(1.1)',
+                        filter: 'brightness(1.1)',
+                        transition: 'all 2s ease-out'
+                    }}
+                />
+
+                {/* Gradient Overlay */}
+                <div
+                    id="contactHeroOverlay"
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(135deg, rgba(122,138,111,0.5) 0%, rgba(90,106,79,0.5) 100%)',
+                        zIndex: 1,
+                        opacity: 0,
+                        transition: 'opacity 1.5s ease-out'
+                    }}
+                />
+
+                <div className="container" style={{ maxWidth: '800px', textAlign: 'center', position: 'relative', zIndex: 20, padding: '0 24px' }}>
+                    <h1
+                        id="contactHeroTitle"
+                        className="heading-1"
+                        style={{
+                            fontSize: 'clamp(36px, 5vw, 56px)',
+                            fontWeight: '600',
+                            lineHeight: '1.3',
+                            marginBottom: '24px',
+                            color: '#fff',
+                            opacity: 0,
+                            transform: 'translateY(40px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
+                        Get in Touch
+                    </h1>
+                    <p
+                        id="contactHeroSubtitle"
+                        className="body-large"
+                        style={{
+                            fontSize: 'clamp(18px, 2.5vw, 22px)',
+                            lineHeight: '1.7',
+                            opacity: 0,
+                            fontWeight: '300',
+                            maxWidth: '600px',
+                            margin: '0 auto',
+                            color: '#fff',
+                            transform: 'translateY(50px)',
+                            filter: 'blur(10px)',
+                            transition: 'all 1.4s ease-out'
+                        }}
+                    >
                         Ready to start your leadership journey? We'd love to hear from you.
                     </p>
                 </div>

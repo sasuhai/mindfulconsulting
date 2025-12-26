@@ -2,16 +2,150 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
+interface MissionContent {
+    heroStatus: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    heroButtonText: string;
+    coreValuesTitle: string;
+    coreValuesSubtitle: string;
+    values: Array<{
+        number: string;
+        title: string;
+        description: string;
+        quote: string;
+        color: string;
+    }>;
+    howWeWorkTitle: string;
+    howWeWorkSubtitle: string;
+    howWeWorkPrinciples: Array<{
+        icon: string;
+        text: string;
+    }>;
+    howWeWorkClosing: string;
+    whatWeDoTitle: string;
+    services: Array<{
+        icon: string;
+        title: string;
+        description: string;
+    }>;
+    whoWeServeTitle: string;
+    audiences: string[];
+    whoWeServeClosing: string;
+    whoWeServeButtonText: string;
+}
+
+const defaultContent: MissionContent = {
+    heroStatus: 'Our Purpose',
+    heroTitle: 'Mission',
+    heroSubtitle: 'To support leaders in their journey of self-discovery, enabling them to lead with purpose, open pathways for others, and awaken the power already within.',
+    heroButtonText: 'Begin Your Journey →',
+    coreValuesTitle: 'Core Values',
+    coreValuesSubtitle: 'The principles that guide everything we do',
+    values: [
+        {
+            number: '1️⃣',
+            title: 'Inspire',
+            description: 'We inspire individuals and organisations by being fully present — listening deeply, honouring each person\'s journey, and awakening clarity, courage, and possibility from within.',
+            quote: 'Inspiration begins when people feel truly seen and heard.',
+            color: '#7a8a6f'
+        },
+        {
+            number: '2️⃣',
+            title: 'Serve',
+            description: 'We help wholeheartedly — with sincerity, humility, and commitment. Our work is grounded in genuine care, ethical practice, and the belief that meaningful change happens through trust and human connection.',
+            quote: 'Service is not a transaction, but a relationship.',
+            color: '#8b7355'
+        },
+        {
+            number: '3️⃣',
+            title: 'Grow',
+            description: 'We honour nature as teacher and guide — embracing balance, cycles, and sustainability in leadership, learning, and life. Growth is nurtured, not forced.',
+            quote: 'True growth follows natural rhythms.',
+            color: '#5b7c8d'
+        }
+    ],
+    howWeWorkTitle: 'How We Work',
+    howWeWorkSubtitle: 'We work through partnership, not prescription.',
+    howWeWorkPrinciples: [
+        { icon: '👂', text: 'We listen first — deeply and without judgment' },
+        { icon: '🤝', text: 'We respect each person\'s pace, readiness, and context' },
+        { icon: '✨', text: 'We co-create paths forward rather than impose solutions' },
+        { icon: '⚖️', text: 'We balance reflection with practical action' }
+    ],
+    howWeWorkClosing: 'Our approach honours the belief that meaningful growth unfolds naturally when the right conditions are present.',
+    whatWeDoTitle: 'What We Do',
+    services: [
+        {
+            icon: '🎯',
+            title: 'Leadership Coaching',
+            description: 'One-to-one coaching that supports leaders in gaining clarity, strengthening presence, and leading with authenticity and purpose.'
+        },
+        {
+            icon: '👥',
+            title: 'Executive & Team Development',
+            description: 'Facilitated conversations and programs that build trust, alignment, and shared responsibility within leadership teams.'
+        },
+        {
+            icon: '🧘',
+            title: 'Mindful Leadership Workshops',
+            description: 'Interactive sessions designed to cultivate awareness, communication, and sustainable leadership practices.'
+        },
+        {
+            icon: '💭',
+            title: 'Reflection & Growth Conversations',
+            description: 'Structured spaces for leaders to pause, reflect, and explore challenges, transitions, or next chapters.'
+        }
+    ],
+    whoWeServeTitle: 'Who We Serve',
+    audiences: [
+        'Leaders in transition or new roles',
+        'Managers growing into leadership responsibility',
+        'Organisations seeking more human-centred leadership',
+        'Individuals exploring purpose, clarity, and direction'
+    ],
+    whoWeServeClosing: 'If you are open to reflection and growth, we are ready to walk alongside you.',
+    whoWeServeButtonText: 'Start a Conversation →'
+};
 
 export default function MissionPage() {
     const router = useRouter();
     const [scrollY, setScrollY] = useState(0);
+    const [content, setContent] = useState<MissionContent>(defaultContent);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
         window.addEventListener('scroll', handleScroll);
 
-        // About page-style animations
+        // Fetch content from Firebase
+        const fetchContent = async () => {
+            try {
+                const docRef = doc(db, 'pages', 'mission');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setContent(docSnap.data() as MissionContent);
+                }
+            } catch (error) {
+                console.error('Error fetching mission content:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContent();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Trigger animations after content loads
+    useEffect(() => {
+        if (loading) return;
+
         const heroImage = document.getElementById('missionHeroImage');
         const heroOverlay = document.getElementById('missionHeroOverlay');
         const heroStatus = document.getElementById('missionHeroStatus');
@@ -56,14 +190,25 @@ export default function MissionPage() {
                 heroButton.style.filter = 'blur(0px)';
             }
         }, 1400);
-
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [loading]);
 
     const accentColor = '#7a8a6f';
 
+    if (loading) {
+        return (
+            <div className="main-wrapper">
+                <section className="section" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+                        <h3>Loading...</h3>
+                    </div>
+                </section>
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div className="main-wrapper">
             {/* Hero Section with Photo Background */}
             <section style={{
                 position: 'relative',
@@ -75,15 +220,18 @@ export default function MissionPage() {
                 color: '#fff'
             }}>
                 {/* Background Image with zoom animation */}
-                <div
+                <img
                     id="missionHeroImage"
+                    src="/mission-hero.png"
+                    alt="Mission"
                     style={{
                         position: 'absolute',
                         inset: 0,
-                        backgroundImage: 'url(/mission-hero.png)',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        zIndex: 0,
                         opacity: 0,
                         transform: 'scale(1.1)',
                         filter: 'brightness(0.9) blur(10px)',
@@ -98,6 +246,7 @@ export default function MissionPage() {
                         position: 'absolute',
                         inset: 0,
                         background: `linear-gradient(135deg, ${accentColor}88 0%, #5a6a4f88 100%)`,
+                        zIndex: 1,
                         opacity: 0,
                         transition: 'opacity 1.5s ease-out'
                     }}
@@ -124,7 +273,7 @@ export default function MissionPage() {
                             transition: 'all 1.2s ease-out'
                         }}
                     >
-                        Our Purpose
+                        {content.heroStatus}
                     </div>
 
                     <h1
@@ -142,7 +291,7 @@ export default function MissionPage() {
                             transition: 'all 1.4s ease-out'
                         }}
                     >
-                        Mission
+                        {content.heroTitle}
                     </h1>
 
                     <p
@@ -159,8 +308,7 @@ export default function MissionPage() {
                             transition: 'all 1.4s ease-out'
                         }}
                     >
-                        To support leaders in their journey of self-discovery, enabling them to lead with purpose,
-                        open pathways for others, and awaken the power already within.
+                        {content.heroSubtitle}
                     </p>
 
                     <div
@@ -200,7 +348,7 @@ export default function MissionPage() {
                                 e.currentTarget.style.background = '#3b82f6';
                             }}
                         >
-                            Begin Your Journey →
+                            {content.heroButtonText}
                         </a>
                     </div>
                 </div>
@@ -217,37 +365,15 @@ export default function MissionPage() {
                             color: '#1a1a1a',
                             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
                         }}>
-                            Core Values
+                            {content.coreValuesTitle}
                         </h2>
                         <p style={{ fontSize: '18px', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                            The principles that guide everything we do
+                            {content.coreValuesSubtitle}
                         </p>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
-                        {[
-                            {
-                                number: '1️⃣',
-                                title: 'Inspire',
-                                description: 'We inspire individuals and organisations by being fully present — listening deeply, honouring each person\'s journey, and awakening clarity, courage, and possibility from within.',
-                                quote: 'Inspiration begins when people feel truly seen and heard.',
-                                color: '#7a8a6f'
-                            },
-                            {
-                                number: '2️⃣',
-                                title: 'Serve',
-                                description: 'We help wholeheartedly — with sincerity, humility, and commitment. Our work is grounded in genuine care, ethical practice, and the belief that meaningful change happens through trust and human connection.',
-                                quote: 'Service is not a transaction, but a relationship.',
-                                color: '#8b7355'
-                            },
-                            {
-                                number: '3️⃣',
-                                title: 'Grow',
-                                description: 'We honour nature as teacher and guide — embracing balance, cycles, and sustainability in leadership, learning, and life. Growth is nurtured, not forced.',
-                                quote: 'True growth follows natural rhythms.',
-                                color: '#5b7c8d'
-                            }
-                        ].map((value, idx) => (
+                        {content.values.map((value, idx) => (
                             <ValueCard key={idx} value={value} index={idx} />
                         ))}
                     </div>
@@ -274,7 +400,7 @@ export default function MissionPage() {
                             color: '#1a1a1a',
                             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
                         }}>
-                            How We Work
+                            {content.howWeWorkTitle}
                         </h2>
                         <p style={{
                             fontSize: '20px',
@@ -282,17 +408,12 @@ export default function MissionPage() {
                             fontStyle: 'italic',
                             marginBottom: '48px'
                         }}>
-                            We work through partnership, not prescription.
+                            {content.howWeWorkSubtitle}
                         </p>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '32px' }}>
-                        {[
-                            { icon: '👂', text: 'We listen first — deeply and without judgment' },
-                            { icon: '🤝', text: 'We respect each person\'s pace, readiness, and context' },
-                            { icon: '✨', text: 'We co-create paths forward rather than impose solutions' },
-                            { icon: '⚖️', text: 'We balance reflection with practical action' }
-                        ].map((item, idx) => (
+                        {content.howWeWorkPrinciples.map((item, idx) => (
                             <PrincipleCard key={idx} item={item} index={idx} />
                         ))}
                     </div>
@@ -307,7 +428,7 @@ export default function MissionPage() {
                         maxWidth: '700px',
                         margin: '64px auto 0'
                     }}>
-                        Our approach honours the belief that meaningful growth unfolds naturally when the right conditions are present.
+                        {content.howWeWorkClosing}
                     </p>
                 </div>
             </section>
@@ -323,33 +444,12 @@ export default function MissionPage() {
                             color: '#1a1a1a',
                             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
                         }}>
-                            What We Do
+                            {content.whatWeDoTitle}
                         </h2>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
-                        {[
-                            {
-                                icon: '🎯',
-                                title: 'Leadership Coaching',
-                                description: 'One-to-one coaching that supports leaders in gaining clarity, strengthening presence, and leading with authenticity and purpose.'
-                            },
-                            {
-                                icon: '👥',
-                                title: 'Executive & Team Development',
-                                description: 'Facilitated conversations and programs that build trust, alignment, and shared responsibility within leadership teams.'
-                            },
-                            {
-                                icon: '🧘',
-                                title: 'Mindful Leadership Workshops',
-                                description: 'Interactive sessions designed to cultivate awareness, communication, and sustainable leadership practices.'
-                            },
-                            {
-                                icon: '💭',
-                                title: 'Reflection & Growth Conversations',
-                                description: 'Structured spaces for leaders to pause, reflect, and explore challenges, transitions, or next chapters.'
-                            }
-                        ].map((service, idx) => (
+                        {content.services.map((service, idx) => (
                             <ServiceCard key={idx} service={service} index={idx} />
                         ))}
                     </div>
@@ -380,17 +480,12 @@ export default function MissionPage() {
                             marginBottom: '24px',
                             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
                         }}>
-                            Who We Serve
+                            {content.whoWeServeTitle}
                         </h2>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '64px' }}>
-                        {[
-                            'Leaders in transition or new roles',
-                            'Managers growing into leadership responsibility',
-                            'Organisations seeking more human-centred leadership',
-                            'Individuals exploring purpose, clarity, and direction'
-                        ].map((audience, idx) => (
+                        {content.audiences.map((audience, idx) => (
                             <div
                                 key={idx}
                                 style={{
@@ -432,7 +527,7 @@ export default function MissionPage() {
                             margin: 0,
                             fontStyle: 'italic'
                         }}>
-                            If you are open to reflection and growth, we are ready to walk alongside you.
+                            {content.whoWeServeClosing}
                         </p>
                     </div>
 
@@ -462,12 +557,12 @@ export default function MissionPage() {
                                 e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.3)';
                             }}
                         >
-                            Start a Conversation →
+                            {content.whoWeServeButtonText}
                         </a>
                     </div>
                 </div>
             </section>
-        </>
+        </div>
     );
 }
 

@@ -30,6 +30,14 @@ const adminSections: AdminCard[] = [
         available: true
     },
     {
+        title: 'Mission Page',
+        description: 'Edit mission statement, core values, and all mission page content',
+        icon: '🎯',
+        href: '/admin/mission',
+        color: '#7a8a6f',
+        available: true
+    },
+    {
         title: 'Calendar Events',
         description: 'Manage workshops, training sessions, and coaching availability',
         icon: '📅',
