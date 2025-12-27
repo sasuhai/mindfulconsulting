@@ -1,11 +1,65 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TrainingsGrid from '@/components/TrainingsGrid';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
+interface HomeContent {
+  heroBadge: string;
+  heroTitle: string;
+  heroSubtitle1: string;
+  heroSubtitle2: string;
+  heroButtonText: string;
+  trustIndicatorsText: string;
+  trainingProgramsTitle: string;
+  trainingProgramsSubtitle: string;
+  videoUrl: string;
+  videoTitle: string;
+  videoDescription: string;
+  videoClosing: string;
+  ctaTitle: string;
+  ctaDescription: string;
+  ctaButtonText: string;
+}
 
 export default function Home() {
+  const [content, setContent] = useState<HomeContent>({
+    heroBadge: 'Leadership Development',
+    heroTitle: 'Growth with Presence',
+    heroSubtitle1: 'Mindful Consulting partners with organizations and individuals to develop conscious, effective leadership grounded in presence, clarity, and human connection.',
+    heroSubtitle2: 'We believe leadership is not a fixed destination, but a continuous process of growth—shaped by awareness, thoughtful dialogue, and purposeful action. Our work integrates mindfulness with practical business realities, helping leaders navigate complexity while staying grounded, empathetic, and decisive.',
+    heroButtonText: 'Our Mission',
+    trustIndicatorsText: 'TRUSTED BY LEADING INDUSTRIES',
+    trainingProgramsTitle: 'Our Training Programs',
+    trainingProgramsSubtitle: 'Tailored programs to elevate your organization\'s potential.',
+    videoUrl: '9rdrvvEl2vQ',
+    videoTitle: 'The Ten Voices That Define the Experience',
+    videoDescription: 'We\'ve asked AI to analyze from thousands of participants to distill the essence of their experience. These are 10 testimonials represent the most powerful and consistent themes that emerge time and again: practical application, masterful facilitation, and profound personal transformation.',
+    videoClosing: 'These are their words!',
+    ctaTitle: 'Ready to transform your leadership?',
+    ctaDescription: 'Join the hundreds of leaders who have elevated their impact with Mindful Consulting.',
+    ctaButtonText: 'Request a Proposal'
+  });
+
   useEffect(() => {
+    // Fetch content from Firebase
+    const fetchContent = async () => {
+      try {
+        const docRef = doc(db, 'pages', 'home');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setContent(docSnap.data() as HomeContent);
+        }
+      } catch (error) {
+        console.error('Error fetching home content:', error);
+      }
+    };
+
+    fetchContent();
+
     // Trigger animations on mount
     const heroImage = document.getElementById('heroImage');
     const heroOverlay = document.getElementById('heroOverlay');
@@ -18,7 +72,7 @@ export default function Home() {
     setTimeout(() => {
       if (heroImage) {
         heroImage.style.opacity = '1';
-        heroImage.style.transform = 'scale(1) scaleX(-1)';
+        heroImage.style.transform = 'scale(1)';
         heroImage.style.filter = 'brightness(0.7) blur(0px)';
       }
       if (heroOverlay) heroOverlay.style.opacity = '1';
@@ -84,7 +138,7 @@ export default function Home() {
             objectPosition: 'center',
             zIndex: 0,
             opacity: 0,
-            transform: 'scale(1.25) scaleX(-1)',
+            transform: 'scale(1.25)',
             filter: 'brightness(0.56) blur(10px)',
             transition: 'all 2s ease-out'
           }}
@@ -162,7 +216,7 @@ export default function Home() {
             backdropFilter: 'blur(10px)'
           }}>
             <span style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%', marginRight: '8px' }}></span>
-            Leadership Development
+            {content.heroBadge}
           </div>
 
           {/* Title */}
@@ -185,7 +239,7 @@ export default function Home() {
               color: '#fff',
               maxWidth: '900px'
             }}>
-              Growth with Presence
+              {content.heroTitle}
             </h1>
           </div>
 
@@ -207,7 +261,7 @@ export default function Home() {
               marginBottom: '20px',
               lineHeight: '1.6'
             }}>
-              Mindful Consulting partners with organizations and individuals to develop conscious, effective leadership grounded in presence, clarity, and human connection.
+              {content.heroSubtitle1}
             </p>
             <p style={{
               maxWidth: '700px',
@@ -216,7 +270,7 @@ export default function Home() {
               marginBottom: '48px',
               lineHeight: '1.6'
             }}>
-              We believe leadership is not a fixed destination, but a continuous process of growth—shaped by awareness, thoughtful dialogue, and purposeful action. Our work integrates mindfulness with practical business realities, helping leaders navigate complexity while staying grounded, empathetic, and decisive.
+              {content.heroSubtitle2}
             </p>
           </div>
 
@@ -240,7 +294,7 @@ export default function Home() {
               background: '#3b82f6',
               color: '#fff'
             }}>
-              Our Mission <span className="icon-arrow">&rarr;</span>
+              {content.heroButtonText} <span className="icon-arrow">&rarr;</span>
             </Link>
           </div>
 
@@ -267,7 +321,7 @@ export default function Home() {
       <section className="section" style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center' }}>
         <div className="container">
           <p className="text-sm font-medium text-secondary mb-8 trust-text" style={{ color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
-            TRUSTED BY LEADING INDUSTRIES
+            {content.trustIndicatorsText}
           </p>
           <div className="industry-cards-container">
             <div className="industry-card">
@@ -306,11 +360,94 @@ export default function Home() {
       <section className="section bg-surface" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="container">
           <div className="text-center mb-16" style={{ marginBottom: '64px' }}>
-            <h2 className="heading-1 mb-4">Our Training Programs</h2>
-            <p className="body-large">Tailored programs to elevate your organization's potential.</p>
+            <h2 className="heading-1 mb-4">{content.trainingProgramsTitle}</h2>
+            <p className="body-large">{content.trainingProgramsSubtitle}</p>
           </div>
 
           <TrainingsGrid />
+        </div>
+      </section>
+
+      {/* Video Testimonials Section */}
+      <section className="section" style={{
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f1f5f9 100%)',
+        padding: '120px 0'
+      }}>
+        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          {/* Title */}
+          <h2 style={{
+            fontSize: 'clamp(32px, 5vw, 48px)',
+            fontWeight: '700',
+            textAlign: 'center',
+            marginBottom: '24px',
+            color: '#1e293b',
+            letterSpacing: '-0.02em',
+            lineHeight: '1.2'
+          }}>
+            {content.videoTitle}
+          </h2>
+
+          {/* Video Container */}
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '900px',
+            margin: '0 auto 40px',
+            borderRadius: '24px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            background: '#000'
+          }}>
+            {/* 16:9 Aspect Ratio Container */}
+            <div style={{
+              position: 'relative',
+              paddingBottom: '56.25%',
+              height: 0,
+              overflow: 'hidden'
+            }}>
+              <iframe
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none'
+                }}
+                src={`https://www.youtube.com/embed/${content.videoUrl}?autoplay=1&loop=1&playlist=${content.videoUrl}&mute=1&controls=1&modestbranding=1&rel=0`}
+                title={content.videoTitle}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+
+
+          {/* Description */}
+          <div style={{
+            maxWidth: '800px',
+            margin: '0 auto',
+            textAlign: 'center'
+          }}>
+            <p style={{
+              fontSize: 'clamp(16px, 2vw, 18px)',
+              lineHeight: '1.8',
+              color: '#475569',
+              marginBottom: '0'
+            }}>
+              {content.videoDescription}
+              <br />
+              <span style={{
+                fontWeight: '600',
+                color: '#1e293b',
+                fontStyle: 'italic',
+                marginTop: '12px',
+                display: 'inline-block'
+              }}>
+                {content.videoClosing}
+              </span>
+            </p>
+          </div>
         </div>
       </section>
 
@@ -323,12 +460,12 @@ export default function Home() {
         <div className="cta-overlay" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: -1 }}></div>
 
         <div className="container">
-          <h2 className="heading-1 mb-6" style={{ marginBottom: '24px', color: '#ffffff' }}>Ready to transform your leadership?</h2>
+          <h2 className="heading-1 mb-6" style={{ marginBottom: '24px', color: '#ffffff' }}>{content.ctaTitle}</h2>
           <p className="body-large mb-8" style={{ marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px', color: 'rgba(255,255,255,0.9)' }}>
-            Join the hundreds of leaders who have elevated their impact with Mindful Consulting.
+            {content.ctaDescription}
           </p>
           <Link href="/contact" className="btn btn-primary" style={{ background: '#ffffff', color: '#000000' }}>
-            Request a Proposal
+            {content.ctaButtonText}
           </Link>
         </div>
       </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { db, storage } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -34,6 +35,8 @@ export default function AdminGalleryPage() {
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
 
     useEffect(() => {
         fetchAlbums();
@@ -94,9 +97,59 @@ export default function AdminGalleryPage() {
         setIsEditing(true);
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('❌ Please select an image file');
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/upload-gallery-hero', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+            
+            setImageRefreshKey(Date.now());
+            alert('✅ Hero image uploaded successfully!');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('❌ Failed to upload image. Please try again.');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     return (
         <div className="main-wrapper" style={{ paddingTop: '100px', paddingBottom: '60px', minHeight: '100vh', background: 'var(--color-background)' }}>
             <div className="container" style={{ maxWidth: '1200px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <Link
+                        href="/admin"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </Link>
+                </div>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
                     <div>
@@ -110,6 +163,7 @@ export default function AdminGalleryPage() {
                     <div style={{ display: 'flex', gap: '12px' }}>
                         <button
                             onClick={startNewAlbum}
+
                             style={{
                                 padding: '12px 24px',
                                 fontSize: '14px',
@@ -145,6 +199,71 @@ export default function AdminGalleryPage() {
                     </div>
                 </div>
 
+
+                {/* Hero Image Upload */}
+                <div style={{
+                    padding: '20px',
+                    background: 'var(--color-surface)',
+                    borderRadius: '12px',
+                    border: '1px solid var(--color-border)',
+                    marginBottom: '32px'
+                }}>
+                    <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
+                        🖼️ Hero Background Image
+                    </h2>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{ 
+                            border: '2px dashed #d2d2d7', 
+                            borderRadius: '8px', 
+                            padding: '16px',
+                            background: '#f9f9f9'
+                        }}>
+                            <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
+                            <img 
+                                src={`/gallery-hero.jpg?${imageRefreshKey}`}
+                                alt="Gallery Hero Background" 
+                                style={{ 
+                                    width: '100%', 
+                                    maxHeight: '200px', 
+                                    minHeight: '200px',
+                                    objectFit: 'cover', 
+                                    borderRadius: '6px',
+                                    marginBottom: '8px',
+                                    display: 'block',
+                                    backgroundColor: '#e5e5e5'
+                                }} 
+                            />
+                            <p style={{ fontSize: '12px', color: '#999' }}>/gallery-hero.jpg</p>
+                        </div>
+
+                        <div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                disabled={uploadingImage}
+                                style={{ display: 'none' }}
+                                id="galleryHeroImageUpload"
+                            />
+                            <label
+                                htmlFor="galleryHeroImageUpload"
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '10px 20px',
+                                    background: uploadingImage ? '#ccc' : '#3b82f6',
+                                    color: '#fff',
+                                    borderRadius: '6px',
+                                    cursor: uploadingImage ? 'not-allowed' : 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                {uploadingImage ? '⏳ Uploading...' : '📤 Upload New Image'}
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 {/* Instructions */}
                 <div style={{
                     padding: '20px',

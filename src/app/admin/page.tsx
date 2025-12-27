@@ -14,33 +14,41 @@ interface AdminCard {
 
 const adminSections: AdminCard[] = [
     {
-        title: 'Training Programs',
-        description: 'Manage training catalog, add new programs, and update course details',
-        icon: '📚',
-        href: '/admin/trainings',
+        title: 'Home Page',
+        description: 'Edit hero section, trust indicators, and call-to-action content',
+        icon: '',
+        href: '/admin/home',
+        color: '#6a7a8f',
+        available: true
+    },
+    {
+        title: 'About Page',
+        description: 'Edit about page hero section, services, and quote content',
+        icon: '',
+        href: '/admin/about',
+        color: '#5b7c8d',
+        available: true
+    },
+    {
+        title: 'Mission Page',
+        description: 'Edit mission statement, core values, and all mission page content',
+        icon: '',
+        href: '/admin/mission',
         color: '#7a8a6f',
         available: true
     },
     {
         title: 'Program Pages',
         description: 'Edit Leadership, Executive, and Team Effectiveness program pages',
-        icon: '📄',
+        icon: '',
         href: '/admin/programs',
         color: '#8b7355',
         available: true
     },
     {
-        title: 'Mission Page',
-        description: 'Edit mission statement, core values, and all mission page content',
-        icon: '🎯',
-        href: '/admin/mission',
-        color: '#7a8a6f',
-        available: true
-    },
-    {
         title: 'Calendar Events',
         description: 'Manage workshops, training sessions, and coaching availability',
-        icon: '📅',
+        icon: '',
         href: '/admin/calendar',
         color: '#5a7c8d',
         available: true
@@ -48,7 +56,7 @@ const adminSections: AdminCard[] = [
     {
         title: 'Photo Gallery',
         description: 'Sync photos from iCloud and manage gallery captions',
-        icon: '📸',
+        icon: '',
         href: '/admin/gallery',
         color: '#6a7a5f',
         available: true
@@ -56,7 +64,7 @@ const adminSections: AdminCard[] = [
     {
         title: 'Privacy Policy',
         description: 'Edit privacy policy content and contact information',
-        icon: '🔒',
+        icon: '',
         href: '/admin/privacy',
         color: '#6b7c5b',
         available: true
@@ -64,7 +72,7 @@ const adminSections: AdminCard[] = [
     {
         title: 'Settings',
         description: 'Manage contact info, phone number, address, and admin passcode',
-        icon: '⚙️',
+        icon: '',
         href: '/admin/settings',
         color: '#5b7c8d',
         available: true

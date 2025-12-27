@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, setDoc, getDoc } from 'firebase/firestore';
 
 interface ProgramFeature {
     icon: string;
@@ -151,6 +152,9 @@ export default function AdminPrograms() {
     const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         fetchPrograms();
@@ -233,9 +237,59 @@ export default function AdminPrograms() {
         setSelectedProgram({ ...selectedProgram, stats: newStats });
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('❌ Please select an image file');
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/api/upload-programs-hero', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            setImageRefreshKey(Date.now());
+            alert('✅ Hero image uploaded successfully!');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('❌ Failed to upload image. Please try again.');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     return (
         <div className="main-wrapper" style={{ paddingTop: '100px', paddingBottom: '60px', minHeight: '100vh', background: 'var(--color-background)' }}>
             <div className="container" style={{ maxWidth: '1400px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <Link
+                        href="/admin"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </Link>
+                </div>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>
@@ -295,6 +349,125 @@ export default function AdminPrograms() {
                         </div>
                     ))}
                 </div>
+
+                {/* Training Programs Section */}
+                {programs.length > 0 && (
+                    <div style={{
+                        background: 'var(--color-surface)',
+                        borderRadius: '12px',
+                        padding: '32px',
+                        border: '1px solid var(--color-border)',
+                        marginBottom: '40px'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <div>
+                                <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+                                    📚 Training Programs
+                                </h2>
+                                <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
+                                    Manage your training catalog that appears on the programs page
+                                </p>
+                            </div>
+                            <a
+                                href="/admin/trainings"
+                                className="btn btn-primary"
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '14px',
+                                    textDecoration: 'none',
+                                    display: 'inline-block'
+                                }}
+                            >
+                                Manage Trainings →
+                            </a>
+                        </div>
+                    </div>
+                )}
+
+
+                {/* Hero Image Upload */}
+                <div style={{
+                    background: 'var(--color-surface)',
+                    borderRadius: '12px',
+                    padding: '32px',
+                    border: '1px solid var(--color-border)',
+                    marginBottom: '40px'
+                }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: 'var(--color-text-primary)' }}>
+                        🖼️ Hero Background Image
+                    </h2>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{
+                            border: '2px dashed #d2d2d7',
+                            borderRadius: '8px',
+                            padding: '16px',
+                            background: '#f9f9f9'
+                        }}>
+                            <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
+                            <img
+                                src={`/programs-hero.jpg?${imageRefreshKey}`}
+                                alt="Programs Hero Background"
+                                style={{
+                                    width: '100%',
+                                    maxHeight: '200px',
+                                    minHeight: '200px',
+                                    objectFit: 'cover',
+                                    borderRadius: '6px',
+                                    marginBottom: '8px',
+                                    display: 'block',
+                                    backgroundColor: '#e5e5e5'
+                                }}
+                            />
+                            <p style={{ fontSize: '12px', color: '#999' }}>/programs-hero.jpg</p>
+                        </div>
+
+                        <div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                disabled={uploadingImage}
+                                style={{ display: 'none' }}
+                                id="heroImageUpload"
+                            />
+                            <label
+                                htmlFor="heroImageUpload"
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '10px 20px',
+                                    background: uploadingImage ? '#ccc' : '#3b82f6',
+                                    color: '#fff',
+                                    borderRadius: '6px',
+                                    cursor: uploadingImage ? 'not-allowed' : 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                {uploadingImage ? '⏳ Uploading...' : '📤 Upload New Image'}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {/* Programs Page Video Settings */}
+                {programs.length > 0 && (
+                    <div style={{
+                        background: 'var(--color-surface)',
+                        borderRadius: '12px',
+                        padding: '32px',
+                        border: '1px solid var(--color-border)',
+                        marginBottom: '40px'
+                    }}>
+                        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: 'var(--color-text-primary)' }}>
+                            🎬 Programs Page Video
+                        </h2>
+                        <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>
+                            Edit the video that appears on the main programs page (below the training cards)
+                        </p>
+
+                        <ProgramsPageVideoEditor />
+                    </div>
+                )}
 
                 {programs.length === 0 && (
                     <div style={{
@@ -585,6 +758,132 @@ export default function AdminPrograms() {
                         </div>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+}
+
+function ProgramsPageVideoEditor() {
+    const [videoUrl, setVideoUrl] = useState('R1exsjZGe5I');
+    const [videoTitle, setVideoTitle] = useState('The Anatomy of Excellence');
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        fetchVideoSettings();
+    }, []);
+
+    const fetchVideoSettings = async () => {
+        try {
+            const docRef = doc(db, 'pages', 'programs');
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                setVideoUrl(data.videoUrl || 'R1exsjZGe5I');
+                setVideoTitle(data.videoTitle || 'The Anatomy of Excellence');
+            }
+        } catch (error) {
+            console.error('Error fetching video settings:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        setMessage('');
+
+        try {
+            const docRef = doc(db, 'pages', 'programs');
+            await setDoc(docRef, { videoUrl, videoTitle }, { merge: true });
+            setMessage('✅ Video settings saved successfully!');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            console.error('Error saving video settings:', error);
+            setMessage('❌ Failed to save. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+
+    if (loading) {
+        return <div style={{ textAlign: 'center', padding: '20px' }}>Loading...</div>;
+    }
+
+    return (
+        <div>
+            {message && (
+                <div style={{
+                    padding: '12px 16px',
+                    background: message.includes('✅') ? '#d1fae5' : '#fee2e2',
+                    color: message.includes('✅') ? '#065f46' : '#991b1b',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                }}>
+                    {message}
+                </div>
+            )}
+
+            <div style={{ display: 'grid', gap: '16px' }}>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>
+                        YouTube Video ID
+                    </label>
+                    <input
+                        type="text"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        placeholder="e.g., R1exsjZGe5I"
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-border)',
+                            fontSize: '14px'
+                        }}
+                    />
+                    <p style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>
+                        Enter the YouTube video ID (the part after "v=" in the URL)
+                    </p>
+                </div>
+
+                <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>
+                        Video Title
+                    </label>
+                    <input
+                        type="text"
+                        value={videoTitle}
+                        onChange={(e) => setVideoTitle(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-border)',
+                            fontSize: '14px'
+                        }}
+                    />
+                </div>
+
+                <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="btn btn-primary"
+                    style={{
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: saving ? 'not-allowed' : 'pointer',
+                        opacity: saving ? 0.7 : 1
+                    }}
+                >
+                    {saving ? 'Saving...' : '💾 Save Video Settings'}
+                </button>
             </div>
         </div>
     );

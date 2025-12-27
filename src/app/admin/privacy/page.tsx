@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -172,6 +173,22 @@ export default function AdminPrivacyPage() {
     return (
         <div className="main-wrapper" style={{ paddingTop: '100px', paddingBottom: '60px', minHeight: '100vh', background: 'var(--color-background)' }}>
             <div className="container" style={{ maxWidth: '1400px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <Link
+                        href="/admin"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </Link>
+                </div>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                     <div>

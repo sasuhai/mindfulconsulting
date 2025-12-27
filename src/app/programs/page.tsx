@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import TrainingsGrid from '@/components/TrainingsGrid';
 
@@ -24,11 +24,31 @@ function ProgramsContent() {
     const trainingId = searchParams.get('id');
     const [training, setTraining] = useState<Training | null>(null);
     const [loading, setLoading] = useState(false);
+    const [videoUrl, setVideoUrl] = useState('R1exsjZGe5I');
+    const [videoTitle, setVideoTitle] = useState('The Anatomy of Excellence');
 
     useEffect(() => {
         if (trainingId) {
             fetchTraining(trainingId);
         } else {
+            // Fetch video settings
+            const fetchVideoSettings = async () => {
+                try {
+                    const docRef = doc(db, 'pages', 'programs');
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        setVideoUrl(data.videoUrl || 'R1exsjZGe5I');
+                        setVideoTitle(data.videoTitle || 'The Anatomy of Excellence');
+                    }
+                } catch (error) {
+                    console.error('Error fetching video settings:', error);
+                }
+            };
+
+            fetchVideoSettings();
+
             // Hero animations for main programs page
             const heroImage = document.getElementById('programsHeroImage');
             const heroOverlay = document.getElementById('programsHeroOverlay');
@@ -431,7 +451,7 @@ function ProgramsContent() {
                                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
                             }}
                         >
-                            <span style={{ fontSize: '24px' }}>🎯</span>
+
                             Leadership Development
                         </Link>
 
@@ -463,7 +483,7 @@ function ProgramsContent() {
                                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
                             }}
                         >
-                            <span style={{ fontSize: '24px' }}>👔</span>
+
                             Executive Coaching
                         </Link>
 
@@ -495,7 +515,7 @@ function ProgramsContent() {
                                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
                             }}
                         >
-                            <span style={{ fontSize: '24px' }}>🤝</span>
+
                             Team Effectiveness
                         </Link>
                     </div>
@@ -505,6 +525,96 @@ function ProgramsContent() {
             <section className="section">
                 <div className="container">
                     <TrainingsGrid />
+                </div>
+            </section>
+
+            {/* Video Section - The Anatomy of Excellence */}
+            <section className="section" style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+                padding: '120px 0',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                {/* Decorative Background Pattern */}
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0.05,
+                    backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                    backgroundSize: '40px 40px',
+                    pointerEvents: 'none'
+                }} />
+
+                <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+                    {/* Title */}
+                    <h2 style={{
+                        fontSize: 'clamp(32px, 5vw, 48px)',
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        marginBottom: '24px',
+                        color: '#fff',
+                        letterSpacing: '-0.02em',
+                        lineHeight: '1.2'
+                    }}>
+                        The Anatomy of Excellence
+                    </h2>
+
+                    {/* Video Container */}
+                    <div style={{
+                        position: 'relative',
+                        width: '100%',
+                        maxWidth: '900px',
+                        margin: '0 auto',
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                        background: '#000'
+                    }}>
+                        {/* 16:9 Aspect Ratio Container */}
+                        <div style={{
+                            position: 'relative',
+                            paddingBottom: '56.25%',
+                            height: 0,
+                            overflow: 'hidden'
+                        }}>
+                            <iframe
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    border: 'none'
+                                }}
+                                src={`https://www.youtube.com/embed/${videoUrl}?autoplay=1&loop=1&playlist=${videoUrl}&mute=1&controls=1&modestbranding=1&rel=0`}
+                                title={videoTitle}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        </div>
+                    </div>
+
+                    {/* Unmute Note */}
+                    <div style={{
+                        textAlign: 'center',
+                        marginTop: '16px'
+                    }}>
+                        <p style={{
+                            fontSize: '14px',
+                            color: '#94a3b8',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.7 }}>
+                                <path d="M11 5L6 9H2V15H6L11 19V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Click the unmute button to listen
+                        </p>
+                    </div>
                 </div>
             </section>
         </div>

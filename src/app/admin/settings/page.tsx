@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -22,6 +23,8 @@ export default function SettingsPage() {
     const [saving, setSaving] = useState(false);
     const [showPasscode, setShowPasscode] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
 
     useEffect(() => {
         fetchSettings();
@@ -66,6 +69,42 @@ export default function SettingsPage() {
         }
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setMessage({ type: 'error', text: '❌ Please select an image file' });
+            return;
+        }
+
+        setUploadingImage(true);
+        setMessage(null);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/upload-contact-hero', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+            
+            setImageRefreshKey(Date.now());
+            setMessage({ type: 'success', text: '✅ Contact hero image uploaded successfully!' });
+            setTimeout(() => setMessage(null), 3000);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            setMessage({ type: 'error', text: '❌ Failed to upload image. Please try again.' });
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     const showMessage = (type: 'success' | 'error', text: string) => {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 3000);
@@ -90,6 +129,22 @@ export default function SettingsPage() {
             maxWidth: '800px',
             margin: '0 auto'
         }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <Link
+                        href="/admin"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </Link>
+                </div>
             {/* Header */}
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '32px', fontWeight: '600', marginBottom: '8px', color: '#1a1a1a' }}>
@@ -115,6 +170,71 @@ export default function SettingsPage() {
             )}
 
             {/* Settings Form */}
+
+            {/* Contact Hero Image Section */}
+            <div style={{
+                background: '#fff',
+                borderRadius: '12px',
+                border: '1px solid #e5e5e5',
+                padding: '32px',
+                marginBottom: '24px'
+            }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: '#1a1a1a' }}>
+                    ��️ Contact Page Hero Image
+                </h2>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ 
+                        border: '2px dashed #d2d2d7', 
+                        borderRadius: '8px', 
+                        padding: '16px',
+                        background: '#f9f9f9'
+                    }}>
+                        <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
+                        <img 
+                            src={`/contact-hero.jpg?${imageRefreshKey}`}
+                            alt="Contact Hero Background" 
+                            style={{ 
+                                width: '100%', 
+                                maxHeight: '200px', 
+                                minHeight: '200px',
+                                objectFit: 'cover', 
+                                borderRadius: '6px',
+                                marginBottom: '8px',
+                                display: 'block',
+                                backgroundColor: '#e5e5e5'
+                            }} 
+                        />
+                        <p style={{ fontSize: '12px', color: '#999' }}>/contact-hero.jpg</p>
+                    </div>
+
+                    <div>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                            style={{ display: 'none' }}
+                            id="contactHeroImageUpload"
+                        />
+                        <label
+                            htmlFor="contactHeroImageUpload"
+                            style={{
+                                display: 'inline-block',
+                                padding: '10px 20px',
+                                background: uploadingImage ? '#ccc' : '#3b82f6',
+                                color: '#fff',
+                                borderRadius: '6px',
+                                cursor: uploadingImage ? 'not-allowed' : 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                            }}
+                        >
+                            {uploadingImage ? '⏳ Uploading...' : '📤 Upload New Image'}
+                        </label>
+                    </div>
+                </div>
+            </div>
             <div style={{
                 background: '#fff',
                 borderRadius: '12px',

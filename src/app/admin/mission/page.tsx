@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import Link from 'next/link';
 
 interface MissionContent {
     heroStatus: string;
@@ -118,6 +119,8 @@ export default function AdminMissionPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageRefreshKey, setImageRefreshKey] = useState(Date.now());
 
     useEffect(() => {
         fetchContent();
@@ -155,6 +158,41 @@ export default function AdminMissionPage() {
         }
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setMessage('❌ Please select an image file');
+            return;
+        }
+
+        setUploadingImage(true);
+        setMessage('');
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/upload-mission-hero', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+            
+            setImageRefreshKey(Date.now());
+            setMessage('✅ Hero image uploaded successfully!');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            setMessage('❌ Failed to upload image. Please try again.');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="main-wrapper">
@@ -172,6 +210,22 @@ export default function AdminMissionPage() {
         <div className="main-wrapper">
             <section className="section bg-surface">
                 <div className="container" style={{ maxWidth: '1000px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <Link
+                        href="/admin"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </Link>
+                </div>
                     <div style={{ marginBottom: '32px' }}>
                         <h1 className="heading-1 mb-4">Edit Mission Page</h1>
                         <p className="body-text text-secondary">
@@ -200,6 +254,63 @@ export default function AdminMissionPage() {
                             </h2>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                                        Hero Background Image
+                                    </label>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div style={{ 
+                                            border: '2px dashed #d2d2d7', 
+                                            borderRadius: '8px', 
+                                            padding: '16px',
+                                            background: '#f9f9f9'
+                                        }}>
+                                            <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
+                                            <img 
+                                                src={`/mission-hero.png?${imageRefreshKey}`}
+                                                alt="Mission Hero Background" 
+                                                style={{ 
+                                                    width: '100%', 
+                                                    maxHeight: '200px', 
+                                                    minHeight: '200px',
+                                                    objectFit: 'cover', 
+                                                    borderRadius: '6px',
+                                                    marginBottom: '8px',
+                                                    display: 'block',
+                                                    backgroundColor: '#e5e5e5'
+                                                }} 
+                                            />
+                                            <p style={{ fontSize: '12px', color: '#999' }}>/mission-hero.png</p>
+                                        </div>
+
+                                        <div>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                disabled={uploadingImage}
+                                                style={{ display: 'none' }}
+                                                id="missionHeroImageUpload"
+                                            />
+                                            <label
+                                                htmlFor="missionHeroImageUpload"
+                                                style={{
+                                                    display: 'inline-block',
+                                                    padding: '10px 20px',
+                                                    background: uploadingImage ? '#ccc' : '#3b82f6',
+                                                    color: '#fff',
+                                                    borderRadius: '6px',
+                                                    cursor: uploadingImage ? 'not-allowed' : 'pointer',
+                                                    fontSize: '14px',
+                                                    fontWeight: '500'
+                                                }}
+                                            >
+                                                {uploadingImage ? '⏳ Uploading...' : '📤 Upload New Image'}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
                                         Status Badge
@@ -488,28 +599,8 @@ export default function AdminMissionPage() {
                                 {content.howWeWorkPrinciples.map((principle, idx) => (
                                     <div key={idx} style={{ padding: '16px', background: '#f9f9f9', borderRadius: '8px' }}>
                                         <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Principle {idx + 1}</h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '12px' }}>
-                                            <div>
-                                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
-                                                    Icon
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={principle.icon}
-                                                    onChange={(e) => {
-                                                        const newPrinciples = [...content.howWeWorkPrinciples];
-                                                        newPrinciples[idx].icon = e.target.value;
-                                                        setContent({ ...content, howWeWorkPrinciples: newPrinciples });
-                                                    }}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '8px',
-                                                        borderRadius: '6px',
-                                                        border: '1px solid #d2d2d7',
-                                                        fontSize: '14px'
-                                                    }}
-                                                />
-                                            </div>
+                                        <div>
+
                                             <div>
                                                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
                                                     Text
@@ -587,28 +678,8 @@ export default function AdminMissionPage() {
                                         <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>Service {idx + 1}</h3>
 
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '12px' }}>
-                                                <div>
-                                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
-                                                        Icon
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        value={service.icon}
-                                                        onChange={(e) => {
-                                                            const newServices = [...content.services];
-                                                            newServices[idx].icon = e.target.value;
-                                                            setContent({ ...content, services: newServices });
-                                                        }}
-                                                        style={{
-                                                            width: '100%',
-                                                            padding: '8px',
-                                                            borderRadius: '6px',
-                                                            border: '1px solid #d2d2d7',
-                                                            fontSize: '14px'
-                                                        }}
-                                                    />
-                                                </div>
+                                            <div>
+
                                                 <div>
                                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '500' }}>
                                                         Title

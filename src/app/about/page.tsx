@@ -1,10 +1,86 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
+interface CredentialItem {
+    title: string;
+    description: string;
+}
+
+interface FocusAreaItem {
+    title: string;
+    description: string;
+}
+
+interface AboutContent {
+    heroBadge: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    workshopsIntro: string;
+    ogyBadge: string;
+    ogyName: string;
+    ogyIntro: string;
+    ogyParagraph1: string;
+    ogyParagraph2: string;
+    ogyParagraph3: string;
+    credentialsTitle: string;
+    credentials: CredentialItem[];
+    focusAreasTitle: string;
+    focusAreas: FocusAreaItem[];
+    quoteText: string;
+    quoteAuthor: string;
+}
 
 export default function AboutPage() {
+    const [content, setContent] = useState<AboutContent>({
+        heroBadge: 'Leadership Development Experts',
+        heroTitle: 'Our Services',
+        heroSubtitle: 'At Mindful Consulting, we create safe, thoughtful spaces where leaders can pause, reflect, and move forward with presence—supporting growth that is both human and sustainable.',
+        workshopsIntro: 'Designed to be interactive, reflective, and immediately applicable:',
+        ogyBadge: 'About Ogy',
+        ogyName: 'Fauzihain (Ogy)',
+        ogyIntro: 'Leadership consultant, facilitator, and mentor with 24 years of corporate experience across the oil & gas, banking, and research sectors, and 8 years as a dedicated leadership consultant and facilitator.',
+        ogyParagraph1: 'Ogy is driven by a simple yet powerful purpose: to help people know something they didn\'t know before and do something they could not do before. Her work focuses on enabling sustainable behavior change through self-awareness, practical application, and continuous personal growth.',
+        ogyParagraph2: 'She is known for her highly experiential and learner-centered facilitation style. She emphasizes real-life application, reflective learning, and the sharing of lived experiences to ensure that participants translate insight into action.',
+        ogyParagraph3: 'Her leadership perspective is shaped by both Eastern and Western influences, with international exposure spanning Houston, Dallas, Melbourne, Jakarta, Malaysia, Brunei, Turkmenistan, Iraq, and Egypt.',
+        credentialsTitle: 'Credentials & Expertise',
+        credentials: [
+            { title: 'ICF-ACC Certified', description: 'International Coaching Federation - Associate Certified Coach' },
+            { title: 'Since 2017', description: 'Leadership Consultant & Facilitator with proven track record' },
+            { title: 'ExxonMobil Mentor of the Year', description: 'Recognized in 2010 for outstanding dedication to mentoring' },
+            { title: 'Certified Yoga Teacher', description: 'Integrating mindfulness and well-being into leadership' },
+            { title: 'Global Experience', description: 'International exposure across multiple continents' },
+            { title: '24+ Years Corporate', description: 'Oil & gas, banking, and research sectors expertise' }
+        ],
+        focusAreasTitle: 'Areas of Focus',
+        focusAreas: [
+            { title: 'Empowering Leaders', description: 'Developing mindful, authentic leaders who create psychological safety and inspire sustainable change.' },
+            { title: 'Confident Communicators', description: 'Building public speaking capabilities and effective communication skills through experiential learning.' },
+            { title: 'Whole-Person Growth', description: 'Fostering holistic development through self-awareness, mindfulness, and continuous personal evolution.' }
+        ],
+        quoteText: 'The quality of our lives depends not on whether or not we have conflicts, but on how we respond to them.',
+        quoteAuthor: 'Thomas Crum'
+    });
+
     useEffect(() => {
+        // Fetch content from Firebase
+        const fetchContent = async () => {
+            try {
+                const docRef = doc(db, 'pages', 'about');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setContent(docSnap.data() as AboutContent);
+                }
+            } catch (error) {
+                console.error('Error fetching about content:', error);
+            }
+        };
+
+        fetchContent();
         // Page load animations
         const heroImage = document.getElementById('heroImage');
         const heroOverlay = document.getElementById('heroOverlay');
@@ -145,7 +221,7 @@ export default function AboutPage() {
                                 fontWeight: '500'
                             }}>
                                 <span style={{ width: '8px', height: '8px', background: '#d4d4d8', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
-                                Leadership Development Experts
+                                {content.heroBadge}
                             </span>
                         </div>
 
@@ -168,7 +244,7 @@ export default function AboutPage() {
                                 marginBottom: '24px',
                                 color: '#fff'
                             }}>
-                                Our Services
+                                {content.heroTitle}
                             </h1>
                         </div>
 
@@ -190,7 +266,7 @@ export default function AboutPage() {
                                 marginBottom: '32px',
                                 lineHeight: '1.6'
                             }}>
-                                At Mindful Consulting, we create safe, thoughtful spaces where leaders can pause, reflect, and move forward with presence—supporting growth that is both human and sustainable.
+                                {content.heroSubtitle}
                             </p>
 
                             <h2 style={{
@@ -209,7 +285,7 @@ export default function AboutPage() {
                                 marginBottom: '20px',
                                 lineHeight: '1.6'
                             }}>
-                                Designed to be interactive, reflective, and immediately applicable:
+                                {content.workshopsIntro}
                             </p>
                             <ul style={{
                                 maxWidth: '800px',
@@ -399,7 +475,7 @@ export default function AboutPage() {
                                     boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
                                 }}>
                                     <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '28px', fontWeight: '600', color: '#fff', marginBottom: '4px' }}>500+</div>
+                                        <div style={{ fontSize: '28px', fontWeight: '600', color: '#fff', marginBottom: '4px' }}>1000+</div>
                                         <div style={{ fontSize: '12px', color: '#a1a1aa' }}>Leaders Trained</div>
                                     </div>
                                 </div>
@@ -426,7 +502,7 @@ export default function AboutPage() {
                                 fontWeight: '500',
                                 color: '#d4d4d8'
                             }}>
-                                About Ogy
+                                {content.ogyBadge}
                             </span>
 
                             <h2 style={{
@@ -436,24 +512,24 @@ export default function AboutPage() {
                                 marginBottom: '32px',
                                 color: '#fff'
                             }}>
-                                Fauzihain (Ogy)
+                                {content.ogyName}
                             </h2>
 
                             <div style={{ marginBottom: '40px', color: '#d4d4d8', lineHeight: '1.6' }}>
                                 <p style={{ fontSize: '18px', marginBottom: '24px', fontWeight: '500' }}>
-                                    Leadership consultant, facilitator, and mentor with 24 years of corporate experience across the oil & gas, banking, and research sectors, and 8 years as a dedicated leadership consultant and facilitator.
+                                    {content.ogyIntro}
                                 </p>
 
                                 <p style={{ marginBottom: '24px' }}>
-                                    Ogy is driven by a simple yet powerful purpose: to help people know something they didn't know before and do something they could not do before. Her work focuses on enabling sustainable behavior change through self-awareness, practical application, and continuous personal growth.
+                                    {content.ogyParagraph1}
                                 </p>
 
                                 <p style={{ marginBottom: '24px' }}>
-                                    She is known for her highly experiential and learner-centered facilitation style. She emphasizes real-life application, reflective learning, and the sharing of lived experiences to ensure that participants translate insight into action.
+                                    {content.ogyParagraph2}
                                 </p>
 
                                 <p>
-                                    Her leadership perspective is shaped by both Eastern and Western influences, with international exposure spanning Houston, Dallas, Melbourne, Jakarta, Malaysia, Brunei, Turkmenistan, Iraq, and Egypt.
+                                    {content.ogyParagraph3}
                                 </p>
                             </div>
 
@@ -512,48 +588,11 @@ export default function AboutPage() {
                             filter: 'blur(8px)',
                             transition: 'all 1s ease-out'
                         }}>
-                            Credentials & Expertise
+                            {content.credentialsTitle}
                         </h3>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '48px' }}>
-                            {[
-                                {
-                                    icon: '📜',
-                                    title: 'ICF-ACC Certified',
-                                    description: 'International Coaching Federation - Associate Certified Coach',
-                                    delay: '100ms'
-                                },
-                                {
-                                    icon: '🎯',
-                                    title: 'Since 2017',
-                                    description: 'Leadership Consultant & Facilitator with proven track record',
-                                    delay: '200ms'
-                                },
-                                {
-                                    icon: '🏆',
-                                    title: 'ExxonMobil Mentor of the Year',
-                                    description: 'Recognized in 2010 for outstanding dedication to mentoring',
-                                    delay: '300ms'
-                                },
-                                {
-                                    icon: '🧘',
-                                    title: 'Certified Yoga Teacher',
-                                    description: 'Integrating mindfulness and well-being into leadership',
-                                    delay: '400ms'
-                                },
-                                {
-                                    icon: '🌏',
-                                    title: 'Global Experience',
-                                    description: 'International exposure across multiple continents',
-                                    delay: '500ms'
-                                },
-                                {
-                                    icon: '💼',
-                                    title: '24+ Years Corporate',
-                                    description: 'Oil & gas, banking, and research sectors expertise',
-                                    delay: '600ms'
-                                }
-                            ].map((item, index) => (
+                            {content.credentials && content.credentials.map((item, index) => (
                                 <div
                                     key={index}
                                     className="parallax-element"
@@ -562,15 +601,14 @@ export default function AboutPage() {
                                         transform: 'translateY(60px)',
                                         filter: 'blur(8px)',
                                         transition: 'all 1s ease-out',
-                                        transitionDelay: item.delay,
+                                        transitionDelay: `${(index + 1) * 100}ms`,
                                         background: 'rgba(39,39,42,0.3)',
                                         border: '1px solid rgba(39,39,42,0.5)',
                                         borderRadius: '16px',
                                         padding: '24px',
-                                        textAlign: 'center'
+                                        textAlign: 'left'
                                     }}
                                 >
-                                    <div style={{ fontSize: '40px', marginBottom: '12px' }}>{item.icon}</div>
                                     <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', marginBottom: '8px' }}>
                                         {item.title}
                                     </h4>
@@ -596,30 +634,11 @@ export default function AboutPage() {
                             transition: 'all 1s ease-out',
                             transitionDelay: '200ms'
                         }}>
-                            Areas of Focus
+                            {content.focusAreasTitle}
                         </h3>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-                            {[
-                                {
-                                    icon: '👥',
-                                    title: 'Empowering Leaders',
-                                    description: 'Developing mindful, authentic leaders who create psychological safety and inspire sustainable change.',
-                                    delay: '300ms'
-                                },
-                                {
-                                    icon: '🎤',
-                                    title: 'Confident Communicators',
-                                    description: 'Building public speaking capabilities and effective communication skills through experiential learning.',
-                                    delay: '450ms'
-                                },
-                                {
-                                    icon: '🌱',
-                                    title: 'Whole-Person Growth',
-                                    description: 'Fostering holistic development through self-awareness, mindfulness, and continuous personal evolution.',
-                                    delay: '600ms'
-                                }
-                            ].map((area, index) => (
+                            {content.focusAreas && content.focusAreas.map((area, index) => (
                                 <div
                                     key={index}
                                     className="parallax-element"
@@ -628,14 +647,13 @@ export default function AboutPage() {
                                         transform: 'translateY(80px)',
                                         filter: 'blur(8px)',
                                         transition: 'all 1s ease-out',
-                                        transitionDelay: area.delay,
+                                        transitionDelay: `${300 + (index * 150)}ms`,
                                         background: 'linear-gradient(135deg, rgba(39,39,42,0.4) 0%, rgba(39,39,42,0.2) 100%)',
                                         border: '1px solid rgba(63,63,70,0.5)',
                                         borderRadius: '16px',
                                         padding: '32px'
                                     }}
                                 >
-                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>{area.icon}</div>
                                     <h4 style={{ fontSize: '22px', fontWeight: '600', color: '#fff', marginBottom: '12px' }}>
                                         {area.title}
                                     </h4>
@@ -672,10 +690,10 @@ export default function AboutPage() {
                             letterSpacing: '-0.02em',
                             paddingTop: '32px'
                         }}>
-                            To help people know something they didn't know before and do something they could not do before.
+                            {content.quoteText}
                         </blockquote>
                         <div style={{ marginTop: '32px', color: '#a1a1aa' }}>
-                            — Fauzihain (Ogy)
+                            — {content.quoteAuthor}
                         </div>
                     </div>
                 </div>

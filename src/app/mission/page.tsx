@@ -71,31 +71,31 @@ const defaultContent: MissionContent = {
     howWeWorkTitle: 'How We Work',
     howWeWorkSubtitle: 'We work through partnership, not prescription.',
     howWeWorkPrinciples: [
-        { icon: '👂', text: 'We listen first — deeply and without judgment' },
-        { icon: '🤝', text: 'We respect each person\'s pace, readiness, and context' },
-        { icon: '✨', text: 'We co-create paths forward rather than impose solutions' },
-        { icon: '⚖️', text: 'We balance reflection with practical action' }
+        { icon: '', text: 'We listen first — deeply and without judgment' },
+        { icon: '', text: 'We respect each person\'s pace, readiness, and context' },
+        { icon: '', text: 'We co-create paths forward rather than impose solutions' },
+        { icon: '', text: 'We balance reflection with practical action' }
     ],
     howWeWorkClosing: 'Our approach honours the belief that meaningful growth unfolds naturally when the right conditions are present.',
     whatWeDoTitle: 'What We Do',
     services: [
         {
-            icon: '🎯',
+            icon: '',
             title: 'Leadership Coaching',
             description: 'One-to-one coaching that supports leaders in gaining clarity, strengthening presence, and leading with authenticity and purpose.'
         },
         {
-            icon: '👥',
+            icon: '',
             title: 'Executive & Team Development',
             description: 'Facilitated conversations and programs that build trust, alignment, and shared responsibility within leadership teams.'
         },
         {
-            icon: '🧘',
+            icon: '',
             title: 'Mindful Leadership Workshops',
             description: 'Interactive sessions designed to cultivate awareness, communication, and sustainable leadership practices.'
         },
         {
-            icon: '💭',
+            icon: '',
             title: 'Reflection & Growth Conversations',
             description: 'Structured spaces for leaders to pause, reflect, and explore challenges, transitions, or next chapters.'
         }
@@ -387,12 +387,7 @@ export default function MissionPage() {
             }}>
                 <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
                     <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-                        <div style={{
-                            fontSize: '48px',
-                            marginBottom: '24px'
-                        }}>
-                            🔄
-                        </div>
+
                         <h2 style={{
                             fontSize: 'clamp(32px, 4vw, 48px)',
                             fontWeight: '300',
@@ -507,7 +502,7 @@ export default function MissionPage() {
                                     e.currentTarget.style.transform = 'translateY(0)';
                                 }}
                             >
-                                <div style={{ fontSize: '32px', marginBottom: '12px' }}>✓</div>
+                                <div style={{ fontSize: '32px', marginBottom: '12px' }}></div>
                                 <p style={{ fontSize: '15px', lineHeight: '1.6', margin: 0 }}>{audience}</p>
                             </div>
                         ))}
@@ -639,7 +634,7 @@ function PrincipleCard({ item, index }: { item: any; index: number }) {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div style={{ fontSize: '40px', marginBottom: '16px' }}>{item.icon}</div>
+
             <p style={{ fontSize: '15px', lineHeight: '1.6', color: '#444', margin: 0 }}>
                 {item.text}
             </p>
@@ -665,7 +660,7 @@ function ServiceCard({ service, index }: { service: any; index: number }) {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div style={{ fontSize: '48px', marginBottom: '20px' }}>{service.icon}</div>
+
             <h3 style={{
                 fontSize: '22px',
                 fontWeight: '600',
