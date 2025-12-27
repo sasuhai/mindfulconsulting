@@ -67,6 +67,14 @@ export default function Footer() {
                         </div>
                     </div>
 
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <img
+                            src="/footer-qr-code.png"
+                            alt="Scan QR Code"
+                            style={{ width: '180px', height: 'auto' }}
+                        />
+                    </div>
+
                     <div>
                         <h4 className="footer-heading">Company</h4>
                         <ul className="footer-links">
@@ -76,14 +84,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    <div>
-                        <h4 className="footer-heading">Programs</h4>
-                        <ul className="footer-links">
-                            <li><Link href="/programs/leadership">Leadership Development</Link></li>
-                            <li><Link href="/programs/executive">Executive Coaching</Link></li>
-                            <li><Link href="/programs/team">Team Effectiveness</Link></li>
-                        </ul>
-                    </div>
+
 
                     <div>
                         <h4 className="footer-heading">Connect</h4>
