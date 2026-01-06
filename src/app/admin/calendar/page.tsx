@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
 
 interface CalendarEvent {
     id: string;
@@ -105,6 +105,48 @@ export default function AdminCalendarPage() {
         spotsLeft: 0,
         description: ''
     });
+    const [eventTypes, setEventTypes] = useState<string[]>(['workshop', 'coaching', 'training', 'consultation']);
+    const [statusOptions, setStatusOptions] = useState<string[]>(['available', 'limited', 'full']);
+    const [showOptionsModal, setShowOptionsModal] = useState(false);
+    const [optionsLoading, setOptionsLoading] = useState(false);
+
+    useEffect(() => {
+        fetchOptions();
+    }, []);
+
+    const fetchOptions = async () => {
+        try {
+            const docRef = doc(db, 'settings', 'calendar');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.eventTypes) setEventTypes(data.eventTypes);
+                if (data.statusOptions) setStatusOptions(data.statusOptions);
+            }
+        } catch (error) {
+            console.error('Error fetching options:', error);
+        }
+    };
+
+    const handleSaveOptions = async (newTypes: string[], newStatuses: string[]) => {
+        setOptionsLoading(true);
+        try {
+            const docRef = doc(db, 'settings', 'calendar');
+            await setDoc(docRef, {
+                eventTypes: newTypes,
+                statusOptions: newStatuses
+            }, { merge: true });
+            setEventTypes(newTypes);
+            setStatusOptions(newStatuses);
+            alert('✅ Options saved successfully!');
+            setShowOptionsModal(false);
+        } catch (error) {
+            console.error('Error saving options:', error);
+            alert('❌ Failed to save options');
+        } finally {
+            setOptionsLoading(false);
+        }
+    };
 
     useEffect(() => {
         fetchEvents();
@@ -225,16 +267,16 @@ export default function AdminCalendarPage() {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            
+
             const response = await fetch('/api/upload-calendar-hero', {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to upload image');
             }
-            
+
             setImageRefreshKey(Date.now());
             alert('✅ Hero image uploaded successfully!');
         } catch (error) {
@@ -339,28 +381,28 @@ export default function AdminCalendarPage() {
                     <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
                         🖼️ Hero Background Image
                     </h2>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div style={{ 
-                            border: '2px dashed #d2d2d7', 
-                            borderRadius: '8px', 
+                        <div style={{
+                            border: '2px dashed #d2d2d7',
+                            borderRadius: '8px',
                             padding: '16px',
                             background: '#f9f9f9'
                         }}>
                             <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
-                            <img 
+                            <img
                                 src={`/calendar-hero.png?${imageRefreshKey}`}
-                                alt="Calendar Hero Background" 
-                                style={{ 
-                                    width: '100%', 
-                                    maxHeight: '200px', 
+                                alt="Calendar Hero Background"
+                                style={{
+                                    width: '100%',
+                                    maxHeight: '200px',
                                     minHeight: '200px',
-                                    objectFit: 'cover', 
+                                    objectFit: 'cover',
                                     borderRadius: '6px',
                                     marginBottom: '8px',
                                     display: 'block',
                                     backgroundColor: '#e5e5e5'
-                                }} 
+                                }}
                             />
                             <p style={{ fontSize: '12px', color: '#999' }}>/calendar-hero.png</p>
                         </div>
@@ -610,31 +652,64 @@ export default function AdminCalendarPage() {
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
                                         <div>
                                             <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600' }}>Event Type *</label>
-                                            <select
-                                                required
-                                                value={formData.type}
-                                                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                                                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                                            >
-                                                <option value="workshop">Workshop</option>
-                                                <option value="training">Training</option>
-                                                <option value="coaching">Coaching</option>
-                                                <option value="consultation">Consultation</option>
-                                            </select>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <select
+                                                    required
+                                                    value={formData.type}
+                                                    onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}
+                                                >
+                                                    {eventTypes.map(opt => (
+                                                        <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowOptionsModal(true)}
+                                                    style={{
+                                                        padding: '0 12px',
+                                                        background: 'var(--color-surface)',
+                                                        border: '1px solid var(--color-border)',
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '16px'
+                                                    }}
+                                                    title="Manage Options"
+                                                >
+                                                    ⚙️
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div>
                                             <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600' }}>Status *</label>
-                                            <select
-                                                required
-                                                value={formData.status}
-                                                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                                            >
-                                                <option value="available">Available</option>
-                                                <option value="limited">Limited</option>
-                                                <option value="full">Full</option>
-                                            </select>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <select
+                                                    required
+                                                    value={formData.status}
+                                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                                                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}
+                                                >
+                                                    {statusOptions.map(opt => (
+                                                        <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowOptionsModal(true)}
+                                                    style={{
+                                                        padding: '0 12px',
+                                                        background: 'var(--color-surface)',
+                                                        border: '1px solid var(--color-border)',
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '16px'
+                                                    }}
+                                                    title="Manage Options"
+                                                >
+                                                    ⚙️
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -732,6 +807,182 @@ export default function AdminCalendarPage() {
                         </div>
                     </div>
                 )}
+
+                {/* Options Management Modal */}
+                {showOptionsModal && (
+                    <OptionsModal
+                        initialTypes={eventTypes}
+                        initialStatuses={statusOptions}
+                        onClose={() => setShowOptionsModal(false)}
+                        onSave={handleSaveOptions}
+                        loading={optionsLoading}
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
+
+function OptionsModal({ initialTypes, initialStatuses, onClose, onSave, loading }: {
+    initialTypes: string[],
+    initialStatuses: string[],
+    onClose: () => void,
+    onSave: (types: string[], statuses: string[]) => void,
+    loading: boolean
+}) {
+    const [types, setTypes] = useState(initialTypes);
+    const [statuses, setStatuses] = useState(initialStatuses);
+    const [newType, setNewType] = useState('');
+    const [newStatus, setNewStatus] = useState('');
+
+    const addType = () => {
+        if (newType.trim() && !types.includes(newType.trim().toLowerCase())) {
+            setTypes([...types, newType.trim().toLowerCase()]);
+            setNewType('');
+        }
+    };
+
+    const removeType = (typeToRemove: string) => {
+        if (confirm(`Remove type "${typeToRemove}"?`)) {
+            setTypes(types.filter(t => t !== typeToRemove));
+        }
+    };
+
+    const addStatus = () => {
+        if (newStatus.trim() && !statuses.includes(newStatus.trim().toLowerCase())) {
+            setStatuses([...statuses, newStatus.trim().toLowerCase()]);
+            setNewStatus('');
+        }
+    };
+
+    const removeStatus = (statusToRemove: string) => {
+        if (confirm(`Remove status "${statusToRemove}"?`)) {
+            setStatuses(statuses.filter(s => s !== statusToRemove));
+        }
+    };
+
+    return (
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            backdropFilter: 'blur(4px)',
+        }}>
+            <div style={{
+                background: 'var(--color-background)',
+                borderRadius: '16px',
+                width: '100%',
+                maxWidth: '600px',
+                maxHeight: '90vh',
+                overflow: 'auto',
+                padding: '32px',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: '600' }}>Manage Dropdown Options</h2>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>✕</button>
+                </div>
+
+                <div style={{ marginBottom: '32px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Event Types</h3>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <input
+                            value={newType}
+                            onChange={(e) => setNewType(e.target.value)}
+                            placeholder="Add new type..."
+                            style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid var(--color-border)' }}
+                        />
+                        <button
+                            onClick={addType}
+                            style={{ padding: '8px 16px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {types.map(type => (
+                            <span key={type} style={{
+                                padding: '4px 8px',
+                                background: '#f3f4f6',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '4px',
+                                fontSize: '13px',
+                                color: '#1f2937',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}>
+                                {type}
+                                <button
+                                    onClick={() => removeType(type)}
+                                    style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '14px', padding: 0 }}
+                                >✕</button>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: '32px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Status Options</h3>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <input
+                            value={newStatus}
+                            onChange={(e) => setNewStatus(e.target.value)}
+                            placeholder="Add new status..."
+                            style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid var(--color-border)' }}
+                        />
+                        <button
+                            onClick={addStatus}
+                            style={{ padding: '8px 16px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {statuses.map(status => (
+                            <span key={status} style={{
+                                padding: '4px 8px',
+                                background: '#f3f4f6',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '4px',
+                                fontSize: '13px',
+                                color: '#1f2937',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}>
+                                {status}
+                                <button
+                                    onClick={() => removeStatus(status)}
+                                    style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '14px', padding: 0 }}
+                                >✕</button>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', paddingTop: '24px', borderTop: '1px solid var(--color-border)' }}>
+                    <button
+                        onClick={() => onSave(types, statuses)}
+                        disabled={loading}
+                        className="btn btn-primary"
+                        style={{ flex: 1, padding: '12px' }}
+                    >
+                        {loading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="btn btn-outline"
+                        style={{ flex: 1, padding: '12px' }}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     );
