@@ -149,8 +149,10 @@ export default function ContactPage() {
         if (!validateForm()) {
             return;
         }
-        // Remove + and spaces from phone number
-        const cleanPhone = settings.phoneNumber.replace(/[\s+]/g, '');
+        // Use the first phone number for WhatsApp
+        const firstPhone = settings.phoneNumber.split('\n')[0] || '';
+        // Remove + and spaces from phone number, keeping only digits
+        const cleanPhone = firstPhone.replace(/[^\d]/g, '');
         // Format message for WhatsApp
         const whatsappMessage = `Hello!%0A%0AName: ${encodeURIComponent(formData.name)}%0AEmail: ${encodeURIComponent(formData.email)}%0A%0AMessage:%0A${encodeURIComponent(formData.message)}`;
         // Open WhatsApp
@@ -483,9 +485,11 @@ export default function ContactPage() {
                             <div>
                                 <h3 className="text-lg font-bold mb-2">Phone</h3>
                                 <p className="body-text text-secondary">
-                                    <a href={`tel:${settings.phoneNumber.replace(/\s/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                        {settings.phoneNumber}
-                                    </a>
+                                    {settings.phoneNumber.split('\n').filter(p => p.trim()).map((phone, i) => (
+                                        <a key={i} href={`tel:${phone.replace(/[^\d+]/g, '')}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', marginBottom: '4px' }}>
+                                            {phone}
+                                        </a>
+                                    ))}
                                 </p>
                             </div>
                         </div>

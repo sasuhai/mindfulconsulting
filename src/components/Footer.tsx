@@ -67,11 +67,16 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <img
                             src="/footer-qr-code.png"
                             alt="Scan QR Code"
-                            style={{ width: '180px', height: 'auto' }}
+                            style={{
+                                maxWidth: '180px',
+                                width: '100%',
+                                height: 'auto',
+                                objectFit: 'contain'
+                            }}
                         />
                     </div>
 
@@ -90,7 +95,11 @@ export default function Footer() {
                         <h4 className="footer-heading">Connect</h4>
                         <ul className="footer-links">
                             <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
-                            <li><a href={`tel:${settings.phoneNumber.replace(/\s/g, '')}`}>{settings.phoneNumber}</a></li>
+                            <li>
+                                {settings.phoneNumber.split('\n').filter(p => p.trim()).map((phone, i) => (
+                                    <a key={i} href={`tel:${phone.replace(/[^\d+]/g, '')}`} style={{ display: 'block' }}>{phone}</a>
+                                ))}
+                            </li>
                             <li><span dangerouslySetInnerHTML={{ __html: settings.address.replace(/\n/g, '<br />') }} /></li>
                         </ul>
                     </div>

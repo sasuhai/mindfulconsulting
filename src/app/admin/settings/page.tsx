@@ -350,13 +350,13 @@ export default function SettingsPage() {
                         marginBottom: '8px',
                         color: '#1a1a1a'
                     }}>
-                        Phone Number
+                        Phone Numbers (One per line)
                     </label>
-                    <input
-                        type="tel"
+                    <textarea
                         value={settings.phoneNumber}
                         onChange={(e) => handleChange('phoneNumber', e.target.value)}
                         placeholder="+60 12-345 6789"
+                        rows={3}
                         style={{
                             width: '100%',
                             padding: '12px 16px',
@@ -364,7 +364,9 @@ export default function SettingsPage() {
                             border: '1px solid #d1d5db',
                             borderRadius: '8px',
                             outline: 'none',
-                            transition: 'border-color 0.2s'
+                            transition: 'border-color 0.2s',
+                            fontFamily: 'inherit',
+                            resize: 'vertical'
                         }}
                         onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                         onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
