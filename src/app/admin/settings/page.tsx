@@ -84,16 +84,16 @@ export default function SettingsPage() {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            
+
             const response = await fetch('/api/upload-contact-hero', {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to upload image');
             }
-            
+
             setImageRefreshKey(Date.now());
             setMessage({ type: 'success', text: '✅ Contact hero image uploaded successfully!' });
             setTimeout(() => setMessage(null), 3000);
@@ -129,22 +129,22 @@ export default function SettingsPage() {
             maxWidth: '800px',
             margin: '0 auto'
         }}>
-                <div style={{ marginBottom: '20px' }}>
-                    <Link
-                        href="/admin"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            color: 'var(--color-text-secondary)',
-                            textDecoration: 'none',
-                            fontSize: '14px',
-                            transition: 'color 0.2s'
-                        }}
-                    >
-                        ← Back to Dashboard
-                    </Link>
-                </div>
+            <div style={{ marginBottom: '20px' }}>
+                <Link
+                    href="/admin"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: 'var(--color-text-secondary)',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        transition: 'color 0.2s'
+                    }}
+                >
+                    ← Back to Dashboard
+                </Link>
+            </div>
             {/* Header */}
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '32px', fontWeight: '600', marginBottom: '8px', color: '#1a1a1a' }}>
@@ -182,28 +182,28 @@ export default function SettingsPage() {
                 <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: '#1a1a1a' }}>
                     ��️ Contact Page Hero Image
                 </h2>
-                
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ 
-                        border: '2px dashed #d2d2d7', 
-                        borderRadius: '8px', 
+                    <div style={{
+                        border: '2px dashed #d2d2d7',
+                        borderRadius: '8px',
                         padding: '16px',
                         background: '#f9f9f9'
                     }}>
                         <p style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Current Image:</p>
-                        <img 
+                        <img
                             src={`/contact-hero.jpg?${imageRefreshKey}`}
-                            alt="Contact Hero Background" 
-                            style={{ 
-                                width: '100%', 
-                                maxHeight: '200px', 
+                            alt="Contact Hero Background"
+                            style={{
+                                width: '100%',
+                                maxHeight: '200px',
                                 minHeight: '200px',
-                                objectFit: 'cover', 
+                                objectFit: 'cover',
                                 borderRadius: '6px',
                                 marginBottom: '8px',
                                 display: 'block',
                                 backgroundColor: '#e5e5e5'
-                            }} 
+                            }}
                         />
                         <p style={{ fontSize: '12px', color: '#999' }}>/contact-hero.jpg</p>
                     </div>
@@ -382,11 +382,69 @@ export default function SettingsPage() {
                     }}>
                         Address
                     </label>
+                    <div style={{ marginBottom: '8px', display: 'flex', gap: '8px' }}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const textarea = document.getElementById('address-input') as HTMLTextAreaElement;
+                                if (!textarea) return;
+                                const start = textarea.selectionStart;
+                                const end = textarea.selectionEnd;
+                                const text = settings.address;
+                                const before = text.substring(0, start);
+                                const selection = text.substring(start, end);
+                                const after = text.substring(end);
+                                const newText = before + '<b>' + selection + '</b>' + after;
+                                handleChange('address', newText);
+                            }}
+                            style={{
+                                padding: '4px 12px',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                background: '#f3f4f6',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                            title="Bold"
+                        >
+                            B
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const textarea = document.getElementById('address-input') as HTMLTextAreaElement;
+                                if (!textarea) return;
+                                const start = textarea.selectionStart;
+                                const end = textarea.selectionEnd;
+                                const text = settings.address;
+                                const before = text.substring(0, start);
+                                const selection = text.substring(start, end);
+                                const after = text.substring(end);
+                                const newText = before + '<i>' + selection + '</i>' + after;
+                                handleChange('address', newText);
+                            }}
+                            style={{
+                                padding: '4px 12px',
+                                fontSize: '14px',
+                                fontStyle: 'italic',
+                                background: '#f3f4f6',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontFamily: 'serif'
+                            }}
+                            title="Italic"
+                        >
+                            I
+                        </button>
+                    </div>
                     <textarea
+                        id="address-input"
                         value={settings.address}
                         onChange={(e) => handleChange('address', e.target.value)}
-                        placeholder="Enter your business address"
-                        rows={3}
+                        placeholder="Enter your business address (HTML tags supported, Enter for line break)"
+                        rows={5}
                         style={{
                             width: '100%',
                             padding: '12px 16px',
@@ -395,7 +453,7 @@ export default function SettingsPage() {
                             borderRadius: '8px',
                             outline: 'none',
                             transition: 'border-color 0.2s',
-                            fontFamily: 'inherit',
+                            fontFamily: 'monospace',
                             resize: 'vertical'
                         }}
                         onFocus={(e) => e.target.style.borderColor = '#3b82f6'}

@@ -91,14 +91,14 @@ export default function Footer() {
                         <ul className="footer-links">
                             <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
                             <li><a href={`tel:${settings.phoneNumber.replace(/\s/g, '')}`}>{settings.phoneNumber}</a></li>
-                            <li><span>{settings.address}</span></li>
+                            <li><span dangerouslySetInnerHTML={{ __html: settings.address.replace(/\n/g, '<br />') }} /></li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="footer-bottom">
                     <p>
-                        Idiahus &copy; {new Date().getFullYear()} Mindful Consulting. All rights reserved.
+                        Idiahus &copy; {new Date().getFullYear()} Mindful Consulting Sdn Bhd. All rights reserved.
                     </p>
                 </div>
             </div>

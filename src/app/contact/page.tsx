@@ -467,9 +467,10 @@ export default function ContactPage() {
                         <div className="contact-info">
                             <div style={{ marginBottom: '40px' }}>
                                 <h3 className="text-lg font-bold mb-2">Office</h3>
-                                <p className="body-text text-secondary" style={{ whiteSpace: 'pre-line' }}>
-                                    {settings.address}
-                                </p>
+                                <p
+                                    className="body-text text-secondary"
+                                    dangerouslySetInnerHTML={{ __html: settings.address.replace(/\n/g, '<br />') }}
+                                />
                             </div>
                             <div style={{ marginBottom: '40px' }}>
                                 <h3 className="text-lg font-bold mb-2">Email</h3>
