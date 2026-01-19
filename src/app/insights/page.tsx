@@ -1,3 +1,11 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Insights & Thought Leadership',
+    description: 'Perspectives on conscious leadership, mindfulness, and organizational change from our experts at Mindful Consulting.',
+    keywords: ['leadership insights', 'mindfulness at work', 'conscious leadership articles', 'organizational development blog'],
+};
+
 export default function InsightsPage() {
     return (
         <div className="main-wrapper">

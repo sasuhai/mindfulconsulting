@@ -5,17 +5,34 @@ import './dark-mode-overrides.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://mindfulconsulting-538b9.web.app'),
-  title: 'Mindful Consulting Sdn Bhd | Leadership Development',
-  description: 'Growth with Presence',
-  keywords: ['leadership development', 'executive coaching', 'team effectiveness', 'mindful leadership', 'organizational development'],
+  title: {
+    default: 'Mindful Consulting Sdn Bhd | Leadership Development & Executive Coaching',
+    template: '%s | Mindful Consulting'
+  },
+  description: 'Mindful Consulting partners with organizations and individuals to develop conscious, effective leadership grounded in presence, clarity, and human connection. Specializing in leadership programs, executive coaching, and team effectiveness.',
+  keywords: [
+    'leadership development Malaysia',
+    'executive coaching',
+    'team effectiveness workshops',
+    'mindful leadership',
+    'conscious leadership',
+    'HRDCorp claimable training',
+    'corporate training Malaysia',
+    'leadership growth',
+    'mindfulness for leaders'
+  ],
   authors: [{ name: 'Mindful Consulting' }],
   creator: 'Mindful Consulting',
-  publisher: 'Idiahus',
+  publisher: 'Mindful Consulting',
+  alternates: {
+    canonical: '/',
+  },
   verification: {
     google: 'fObp0nmAtX6pGaiWRFeKOTSgTPv9AvYD8aD9QCVGy8c',
   },
@@ -23,27 +40,27 @@ export const metadata: Metadata = {
   // Open Graph (Facebook, LinkedIn, WhatsApp, etc.)
   openGraph: {
     type: 'website',
-    locale: 'en_US',
-   url: 'https://mindfulconsulting-538b9.web.app',
+    locale: 'en_MY',
+    url: 'https://mindfulconsulting-538b9.web.app',
     siteName: 'Mindful Consulting',
-    title: 'Mindful Consulting Sdn Bhd| Leadership Development',
-    description: 'Growth with Presence',
+    title: 'Mindful Consulting Sdn Bhd | Leadership Development & Coaching',
+    description: 'Nurturing conscious, effective leadership grounded in presence and human connection. Partners for organizational growth and personal leadership transformation.',
     images: [
       {
-        url: 'https://mindfulconsulting-538b9.web.app/og-image.png',
-        width: 152,
-        height: 136,
-        alt: 'Mindful Consulting Logo',
+        url: '/hero.png',
+        width: 1200,
+        height: 630,
+        alt: 'Mindful Consulting - Growth with Presence',
       },
     ],
   },
 
   // Twitter Card
   twitter: {
-    card: 'summary',
-    title: 'Mindful Consulting Sdn Bhd | Leadership Development',
-    description: 'Growth with Presence',
-    images: ['https://mindfulconsulting-538b9.web.app/og-image.png'],
+    card: 'summary_large_image',
+    title: 'Mindful Consulting | Leadership Development & Coaching',
+    description: 'Developing conscious leaders grounded in presence and clarity.',
+    images: ['/hero.png'],
   },
 };
 
@@ -66,6 +83,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Navbar />
         <GoogleAnalytics />
+        <AnalyticsTracker />
         <main className="min-h-screen">{children}</main>
         <Footer />
       </body>

@@ -76,6 +76,14 @@ const adminSections: AdminCard[] = [
         href: '/admin/settings',
         color: '#5b7c8d',
         available: true
+    },
+    {
+        title: 'Analytics',
+        description: 'View website traffic, page views, and visitor statistics',
+        icon: '📊',
+        href: '/admin/analytics',
+        color: '#4f46e5',
+        available: true
     }
 ];
 
@@ -168,7 +176,7 @@ export default function AdminDashboard() {
                         <QuickLink
                             icon="📊"
                             label="Analytics"
-                            href="/admin/trainings"
+                            href="/admin/analytics"
                         />
                     </div>
                 </div>
